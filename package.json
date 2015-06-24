@@ -1,0 +1,25 @@
+{
+  "name": "spire",
+  "version": "0.0.0",
+  "description": "playing around with the spire API",
+  "main": "client/index.js",
+  "scripts": {
+    "test": "python -m SimpleHTTPServer && node server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Noura/spire.git"
+  },
+  "author": "Noura Howell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Noura/spire/issues"
+  },
+  "homepage": "https://github.com/Noura/spire",
+  "dependencies": {
+    "cors": "^2.7.1",
+    "express": "^4.13.0",
+    "http": "0.0.0",
+    "request": "^2.58.0"
+  }
+}
