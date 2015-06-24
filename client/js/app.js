@@ -43,6 +43,9 @@ var spire_app = (function() {
             element: document.getElementById('y_axis'),
         });
         graph.render();
+        $('body').append("from: " + (new Date(data.metadata.from*1000)).toString());
+        $('body').append('<br/>');
+        $('body').append("to: " + (new Date(data.metadata.to*1000)).toString());
     }
 
     return {
