@@ -5,6 +5,16 @@ window.onload = function() {
 var spire_app = (function() {
     var data = null;
     var graph = null;
+    var tzOffset = -7 * 3600;
+
+    function init() {
+        $('#submit').on('click', function(e) {
+            var from = Math.floor(new Date($('#from').val()).getTime() / 1000) - tzOffset;
+            var to = Math.floor(new Date($('#to').val()).getTime() / 1000) - tzOffset;
+            console.log('from', from, 'to', to);
+            graph_data(from, to);
+        });
+    }
 
     function format_hr_min(date) {
         var hours = date.getHours().toString();
@@ -15,26 +25,33 @@ var spire_app = (function() {
         return hours + ':' + minutes;
     }
 
-    function init() {
+    function graph_data(from, to) {
         $.ajax({
             url: 'http://localhost:3000',
             data: {
-                url: 'https://app.spire.io//api/events/br',
+                url: 'https://app.spire.io//api/events/br?from=' + from + '&to=' + to,
             },
             error: function(jqxhr, textStatus, errorThrown) {
                 console.log('error in ajax request for spire breath data', jqxhr, textStatus, errorThrown);
             },
             method: 'GET',
             success: function(res) {
-                data = JSON.parse(res);
-                console.log('got response', data);
-                init_graph();
+                try {
+                    data = JSON.parse(res);
+                    if (data.data.length === 0) {
+                        alert('No data points for this time range');
+                    }
+                    console.log('got response', data);
+                    init_graph();
+                } catch (e) {
+                    console.log('error e', e);
+                    alert('Probably there is no data available for this time period.' + e);
+                }
             }
         });
     }
 
     function init_graph() {
-        var tzOffset = -7 * 3600;
         var formatted_data = _.map(data.data, function(o) {
             return { x: o.timestamp + tzOffset, y: o.value };
         });
@@ -70,9 +87,6 @@ var spire_app = (function() {
                 return format_hr_min(d) + ' ' + d.toDateString();
             },
         });
-        $('body').append("from: " + (new Date(data.metadata.from*1000)).toString());
-        $('body').append('<br/>');
-        $('body').append("to: " + (new Date(data.metadata.to*1000)).toString());
     }
 
     return {

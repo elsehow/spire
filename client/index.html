@@ -14,7 +14,11 @@
     <link rel="stylesheet" type="text/css" href="css/app.css">
   </head>
   <body>
-    <h1>Breaths per minute in the last few hours</h1>
+    <span>from time:</span>
+    <input id="from" type="datetime-local">
+    <span>to time:</span>
+    <input id="to" type="datetime-local">
+    <button id="submit">Go</button>
     <div id="chart_container">
       <div id="y_axis"></div>
       <div id="chart"></div>
