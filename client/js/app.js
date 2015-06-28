@@ -26,6 +26,7 @@ var spire_app = (function() {
     }
 
     function graph_data(from, to) {
+        $('#chart_container').html('<div id="y_axis"></div><div id="chart"></div>');
         $.ajax({
             url: 'http://localhost:3000',
             data: {
@@ -59,7 +60,7 @@ var spire_app = (function() {
         graph = new Rickshaw.Graph({
             element: document.querySelector('#chart'),
             width: $(window).width() - 80, // TODO magic numbers are bad
-            height: $(window).height() - 80,
+            height: $(window).height() - 200,
             series: [
                 {
                     color: 'steelblue',
