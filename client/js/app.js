@@ -18,7 +18,7 @@ var spire_app = (function() {
     }
 
     function reset_graph() {
-        $('#chart_container').html('<div id="y_axis"></div><div id="chart"></div>');
+        $('#chart_container').html('<div id="y_axis"></div><div id="chart"></div><div id="preview"></div>');
         graph = new Rickshaw.Graph({
             element: document.querySelector('#chart'),
             width: $(window).width() - 80, // TODO magic numbers are bad
@@ -32,16 +32,22 @@ var spire_app = (function() {
             ],
             renderer: 'scatterplot',
         });
+        graph.render();
+        var preview = new Rickshaw.Graph.RangeSlider({
+            graph: graph,
+            element: document.getElementById('preview'),
+        });
         var y_axis = new Rickshaw.Graph.Axis.Y({
             graph: graph,
             orientation: 'left',
             tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
             element: document.getElementById('y_axis'),
         });
-        var axes = new Rickshaw.Graph.Axis.Time({
+        y_axis.render();
+        var x_axis = new Rickshaw.Graph.Axis.Time({
             graph: graph,
         });
-        axes.render();
+        x_axis.render();
         var hoverDetail = new Rickshaw.Graph.HoverDetail({
             graph: graph,
             xFormatter: function(x) {
@@ -52,6 +58,7 @@ var spire_app = (function() {
     }
 
     function update_graph() {
+        reset_graph();
         graph.update();
     }
 
@@ -73,10 +80,10 @@ var spire_app = (function() {
         _.sortBy(processed_breath_data, function(o) {
             return o.x;
         });
+
     }
 
     function get_data(from, to) {
-        console.log('requesting data from', from, 'to', to);
         var spire_query = 'https://app.spire.io//api/events/br?';
         if ( from !== undefined && to !== undefined) {
             spire_query += 'from=' + from + '&to=' + to;
@@ -93,43 +100,32 @@ var spire_app = (function() {
         });
     }
 
-    function get_all_data() {
-        var t = null;
+    function get_data_in_range(to, from) {
+        var t = to;
+        var ts = [];
         var d = [];
         var n_received = null;
         var n_expected = null;
-        get_data().then(function(res) {
-            var data = JSON.parse(res);
-            update_breath_data(data.data);
-            update_graph();
-            t = data.data.slice(-1)[0].timestamp;
-            console.log('initial time', t, 'with', data.data.length, 'data points');
-            d.push.apply(d, data.data);
-            var ts = [];
-            while (t * 1000 < Date.now()) {
-                ts.push(t);
-                t += 1000;
-            }
-            n_expected = ts.length;
-            console.log('ts', ts);
-            for (var i = 0; i < ts.length; i++) {
-                console.log('requesting data for time', ts[i]);
-                get_data(ts[i], ts[i] + 1000).then(function(res) {
-                    n_received += 1;
-                    var data = JSON.parse(res);
-                    console.log('from time', data.data.slice(-1)[0].timestamp, 'with', data.data.length, 'data points');
-                    d.push.apply(d, data.data);
-                });
-            }
-        });
+
+        while (t + 1000 < from) {
+            ts.push(t);
+            t += 1000;
+        }
+        n_received = 0;
+        n_expected = ts.length;
+        for (var i = 0; i < ts.length; i++) {
+            get_data(ts[i], ts[i] + 1000).then(function(res) {
+                n_received += 1;
+                var data = JSON.parse(res);
+                d.push.apply(d, data.data);
+            });
+        }
         function when_done_hack() {
-            console.log('when done hack n_received', n_received, 'n_expected', n_expected);
             if (n_received === null ||
                 n_expected === null ||
                 n_received < n_expected) {
                 setTimeout(when_done_hack, 5000);
             } else {
-                console.log('\t DONE');
                 update_breath_data(d);
                 update_graph();
             }
@@ -137,24 +133,22 @@ var spire_app = (function() {
         when_done_hack();
     }
 
+    function get_all_data() {
+        get_data().then(function(res) {
+            var data = JSON.parse(res);
+            update_breath_data(data.data);
+            update_graph();
+            var start = data.data.slice(-1)[0].timestamp;
+            var end = Math.floor(new Date().getTime() / 1000);
+            get_data_in_range(start, end);
+        });
+    }
+
     function init() {
-        reset_graph();
         $('#submit').on('click', function(e) {
             var from = Math.floor(new Date($('#from').val()).getTime() / 1000) - tzOffset;
             var to = Math.floor(new Date($('#to').val()).getTime() / 1000) - tzOffset;
-            get_data(from, to).then(function(res) {
-                console.log('got back res:', res);
-                try {
-                    data = JSON.parse(res);
-                    console.log('got data', data);
-                    reset_graph();
-                    reset_breath_data();
-                    update_breath_data(data.data);
-                    update_graph();
-                } catch (e) {
-                    console.log('error e', e);
-                }
-            });
+            get_data_in_range(from, to);
         });
         $('#all').on('click', function(e) {
             get_all_data();
