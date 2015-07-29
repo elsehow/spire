@@ -85,7 +85,7 @@ var spire_app = (function() {
         processed_breath_data.push.apply(processed_breath_data, new_processed_breath_data);
     }
 
-    function get_data(from, to) {
+    function breath_query(from, to) {
         var spire_query = 'https://app.spire.io//api/events/br?';
         if ( from !== undefined && to !== undefined) {
             spire_query += 'from=' + from + '&to=' + to;
@@ -116,7 +116,7 @@ var spire_app = (function() {
         n_received = 0;
         n_expected = ts.length;
         for (var i = 0; i < ts.length; i++) {
-            get_data(ts[i], ts[i] + 1000).then(function(res) {
+            breath_query(ts[i], ts[i] + 1000).then(function(res) {
                 n_received += 1;
                 var data = JSON.parse(res);
                 d.push.apply(d, data.data);
