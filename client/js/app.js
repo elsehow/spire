@@ -129,6 +129,7 @@ var spire_app = (function() {
                 n_received < n_expected) {
                 setTimeout(when_done_hack, 5000);
             } else {
+                reset_breath_data();
                 update_breath_data(d);
                 update_graph();
                 $('#loading').hide();
