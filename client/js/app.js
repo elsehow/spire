@@ -30,7 +30,8 @@ var spire_app = (function() {
                     name: 'breaths per minute',
                 }
             ],
-            renderer: 'scatterplot',
+            //renderer: 'scatterplot',
+            renderer: 'line',
         });
         graph.render();
         var preview = new Rickshaw.Graph.RangeSlider({
@@ -73,14 +74,15 @@ var spire_app = (function() {
             return o.timestamp;
         });
 
-        var new_processed_breath_data = _.map(d, function(o) {
-            return { x: o.timestamp + tzOffset, y: o.value };
-        });
-        processed_breath_data.push.apply(processed_breath_data, new_processed_breath_data);
-        _.sortBy(processed_breath_data, function(o) {
-            return o.x;
-        });
+        var new_processed_breath_data = 
+            _.sortBy(
+                _.map(d, function(o) {
+                    return { x: o.timestamp + tzOffset, y: o.value };
+                }), function(o) {
+                    return o.x;
+            });
 
+        processed_breath_data.push.apply(processed_breath_data, new_processed_breath_data);
     }
 
     function get_data(from, to) {
