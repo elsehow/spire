@@ -103,6 +103,7 @@ var spire_app = (function() {
     }
 
     function get_data_in_range(to, from) {
+        $('#loading').show();
         var t = to;
         var ts = [];
         var d = [];
@@ -130,12 +131,14 @@ var spire_app = (function() {
             } else {
                 update_breath_data(d);
                 update_graph();
+                $('#loading').hide();
             }
         }
         when_done_hack();
     }
 
     function init() {
+        $('#loading').hide();
         $('#submit').on('click', function(e) {
             var from = Math.floor(new Date($('#from').val()).getTime() / 1000) - tzOffset;
             var to = Math.floor(new Date($('#to').val()).getTime() / 1000) - tzOffset;
