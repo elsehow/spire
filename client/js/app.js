@@ -129,10 +129,16 @@ var spire_app = (function() {
                 n_received < n_expected) {
                 setTimeout(when_done_hack, 5000);
             } else {
-                reset_breath_data();
-                update_breath_data(d);
-                update_graph();
-                $('#loading').hide();
+                if (d.length > 0) { // we got data
+                    reset_breath_data();
+                    update_breath_data(d);
+                    update_graph();
+                    $('#loading').hide();
+                } else {
+                    $('#chart_container').html('<div id="y_axis"></div><div id="chart"></div><div id="preview"></div>');
+                    $('#loading').hide();
+                    alert('There appears to be no data available for this time range. Try another time range?');
+                }
             }
         }
         when_done_hack();
