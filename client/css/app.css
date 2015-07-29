@@ -1,11 +1,13 @@
 #chart_container {
     position: relative;
     font-family: Arial, Helvetica, sans-serif;
+    margin-top: 50px;
 }
 
 #chart {
     position: relative;
     left: 40px;
+    padding: 20px;
 }
 
 #y_axis {
@@ -26,4 +28,8 @@
     background-size: 30px;
     background-repeat: no-repeat;
     background-image: url('../img/loading.gif');
+}
+
+#preview {
+    left: 40px;
 }
