@@ -133,25 +133,11 @@ var spire_app = (function() {
         when_done_hack();
     }
 
-    function get_all_data() {
-        get_data().then(function(res) {
-            var data = JSON.parse(res);
-            update_breath_data(data.data);
-            update_graph();
-            var start = data.data.slice(-1)[0].timestamp;
-            var end = Math.floor(new Date().getTime() / 1000);
-            get_data_in_range(start, end);
-        });
-    }
-
     function init() {
         $('#submit').on('click', function(e) {
             var from = Math.floor(new Date($('#from').val()).getTime() / 1000) - tzOffset;
             var to = Math.floor(new Date($('#to').val()).getTime() / 1000) - tzOffset;
             get_data_in_range(from, to);
-        });
-        $('#all').on('click', function(e) {
-            get_all_data();
         });
     }
 
