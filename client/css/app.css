@@ -19,6 +19,7 @@ body {
     padding: 20px;
     border: 2px solid gray;
     border-radius: 5px;
+    background: white;
 }
 h2.graph-title {
     margin-top: 0;

@@ -15,6 +15,8 @@ window.onload = function() {
         tzOffset: spire.tzOffset,
     });
     //var moves_graph = GraphUI('#moves-graph');
+    //
+    $('#graphs-container').sortable();
 
     $(controls).on('new-date', function(ev, date) {
         $('#loading').hide();
