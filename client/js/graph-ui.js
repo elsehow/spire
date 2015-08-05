@@ -10,10 +10,12 @@ var GraphUI = function (options) {
         options.name = 'generic data';
     }
     if (options.tzOffset === undefined) {
+        // TODO force the user to specify tzOffset because they need to think about it even if they don't want to
         options.tzOffset = 0;
     }
 
     var that = {};
+    // TODO change the IDs in the template to classes because with multiple graphs there will be multiple elements with the same ID
     var template = _.template('<h2 class="graph-title"><%=name%></h2><div id="chart"></div><div id="preview"></div>');
     var series_data = [];
     var preview = null;
@@ -31,6 +33,7 @@ var GraphUI = function (options) {
         series_data = _.map(data, function(o) {
             return { x: o[xkey], y: o[ykey] };
         });
+        // TODO remember to sort series_data by x
 
         $(options.parent_selector).empty().append($(template({name: options.name})));
 
@@ -41,6 +44,7 @@ var GraphUI = function (options) {
             series: [{color: options.color, data: series_data, name: options.name}],
             renderer: 'line',
         });
+        // TODO why is this called preview instead of zoomslider
         var preview = new Rickshaw.Graph.RangeSlider({
             graph: graph,
             element: $(options.parent_selector).find('#preview')[0],
@@ -63,7 +67,7 @@ var GraphUI = function (options) {
                 return format_hr_min(d) + ' ' + d.toDateString();
             },
         });
-            graph.update();
+        graph.update();
     };
 
 
