@@ -1,6 +1,6 @@
 window.onload = function() {
     var spire = Spire();
-    var moves = Moves();
+    //var moves = Moves();
 
     var controls = ControlsUI('#controls');
     var breath_graph = GraphUI({
