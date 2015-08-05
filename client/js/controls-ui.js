@@ -3,7 +3,10 @@ var ControlsUI = function (parent_selector) {
     var template = _.template('<input type="date"><input type="button" value="Go">');
 
     that.update = function() {
-        $(parent_selector).empty().append($(template()))
+        $(parent_selector)
+            // draw the template
+            .empty().append($(template()))
+            // assign event listeners
             .find('input[type="button"]').on('click', function() {
                 var date = $(parent_selector).find('input[type="date"]').val();
                 if (date.length === 0) {
