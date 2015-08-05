@@ -22,10 +22,12 @@ window.onload = function() {
         $('#loading').hide();
         spire.get_data('breath', date).then(function(data) {
             console.log('got spire breath data', data);
+            // TODO it would be better to pass this in like
+            // breath_graph.update(data, {x: 'timestamp', y: 'value'})
             breath_graph.update(data, 'timestamp', 'value');
         });
         spire.get_data('step', date).then(function(data) {
-            console.log('gor spire steps data', data);
+            console.log('got spire steps data', data);
             spire_steps_graph.update(data, 'timestamp', 'value');
         });
         /*
