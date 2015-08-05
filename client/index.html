@@ -6,25 +6,40 @@
 
     <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="js/lodash.js"></script>
     <script type="text/javascript" src="js/d3.min.js"></script>
     <script type="text/javascript" src="js/d3.layout.min.js"></script>
+    <script type="text/javascript" src="js/underscore-min.js"></script>
     <script type="text/javascript" src="js/rickshaw.min.js"></script>
 
+    <script type="text/javascript" src="js/moves.js"></script>
+    <script type="text/javascript" src="js/spire.js"></script>
+    <script type="text/javascript" src="js/graph-ui.js"></script>
+    <script type="text/javascript" src="js/controls-ui.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/rickshaw.min.css">
+
+    <link rel="stylesheet" type="text/css" href="css/lodash-templates.css">
     <link rel="stylesheet" type="text/css" href="css/app.css">
   </head>
   <body>
-    <span>from time:</span>
-    <input id="from" type="datetime-local">
-    <span>to time:</span>
-    <input id="to" type="datetime-local">
-    <button id="submit">Go</button>
-    <div id="chart_container">
+
+    <div id="controls">
     </div>
+
+    <div id="breath-graph" class="graph">
+    </div>
+
+    <div id="spire-steps-graph" class="graph">
+    </div>
+
+    <!--
+    <div id="moves-graph" class="graph">
+    </div>
+    -->
+
     <div id="loading">
     </div>
+
   </body>
 </html>
