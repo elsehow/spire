@@ -60,6 +60,7 @@ var GraphUI = function (options) {
             graph: graph,
         });
         x_axis.render();
+        // TODO i think the hoverDetail needs to get updated somehow when the rangeslider changes? it starts to look a little off
         var hoverDetail = new Rickshaw.Graph.HoverDetail({
             graph: graph,
             xFormatter: function(x) {
