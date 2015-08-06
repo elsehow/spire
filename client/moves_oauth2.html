@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+  </head>
+  <body>
+    <p>
+      <a href="https://api.moves-app.com/oauth/v1/authorize?response_type=code&client_id=05m0S3E8PuHf9wAk13HSpAMv9A0P88eE&scope=activity%20location">
+        moves oauth2 step 1
+      </a>
+    </p>
+    <p>
+      <a id="moves-oauth2-step2" href="#">
+        moves oauth2 step 2
+      </a>
+    </p>
+
+    <script type="text/javascript">
+      $('#moves-oauth2-step2').on('click', function(ev) {
+          var auth_code = document.location.search.split(/[?=&]+/)[2];
+          console.log('post request about to be made with auth code', auth_code);
+          $.ajax({
+            url: 'http://localhost:3000/moves_oauth2',
+            data: { auth_code: auth_code },
+            method: 'GET',
+          }).then(function(res) {
+              console.log(res); 
+          });
+      });
+    </script>
+  </body>
+</html>
