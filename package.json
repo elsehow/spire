@@ -1,25 +1,31 @@
 {
-  "name": "spire",
+  "name": "streams-for-the-damned",
   "version": "0.0.0",
-  "description": "playing around with the spire API",
-  "main": "client/index.js",
+  "description": "a tutorial on streams (the functional-reactive kind, whatever that means)",
+  "main": "keystream.js",
   "scripts": {
-    "test": "python -m SimpleHTTPServer && node server/server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Noura/spire.git"
+    "url": "https://github.com/elsehow/streams-for-the-damned.git"
   },
-  "author": "Noura Howell",
-  "license": "ISC",
+  "keywords": [
+    "streams",
+    "FRP",
+    "kefir"
+  ],
+  "author": "elsehow",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Noura/spire/issues"
+    "url": "https://github.com/elsehow/streams-for-the-damned/issues"
   },
-  "homepage": "https://github.com/Noura/spire",
+  "homepage": "https://github.com/elsehow/streams-for-the-damned",
   "dependencies": {
     "cors": "^2.7.1",
-    "express": "^4.13.0",
-    "http": "0.0.0",
-    "request": "^2.58.0"
+    "express": "^4.13.3",
+    "jquery": "^2.1.4",
+    "kefir": "^2.7.2",
+    "lodash": "^3.10.1"
   }
 }
