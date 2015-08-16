@@ -1,26 +1,26 @@
 {
-  "name": "streams-for-the-damned",
-  "version": "0.0.0",
-  "description": "a tutorial on streams (the functional-reactive kind, whatever that means)",
-  "main": "keystream.js",
+  "name": "spire-demo",
+  "version": "0.0.1",
+  "description": "graphing my spire data",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "build": "watchify app/index.js -o bundle.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/elsehow/streams-for-the-damned.git"
+    "url": "https://github.com/elsehow/spire.git"
   },
   "keywords": [
-    "streams",
-    "FRP",
-    "kefir"
+    "spire"
   ],
   "author": "elsehow",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/elsehow/streams-for-the-damned/issues"
+    "url": "https://github.com/elsehow/spire/issues"
   },
-  "homepage": "https://github.com/elsehow/streams-for-the-damned",
+  "homepage": "https://github.com/elsehow/spir",
   "dependencies": {
     "cors": "^2.7.1",
     "express": "^4.13.3",
