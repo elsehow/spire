@@ -2,10 +2,9 @@ playing around with the spire API
 
 to use this
 
-    cd server
-    node server.js
+    npm start
+    npm run-script build
 
-    cd client
-    python -m SimpleHTTPServer
+navigate to localhost:3000
 
-navigate to localhost:8000
+remember to `npm install -g watchify` and `npm install`
