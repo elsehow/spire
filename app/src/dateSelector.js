@@ -6,7 +6,7 @@ var setup = function (doc) {
 
   //draw html
   var template = '<input type = "date" id = "dateSelector"> <button id="fetch">fetch my breathing data</button>'
-  doc.write(template)
+  $(doc.body).append(template)
 
   //streams
   var dateSelectorEvents  = Kefir.fromEvents($('#dateSelector'), 'change')
