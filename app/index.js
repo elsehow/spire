@@ -1,45 +1,19 @@
 var $ = require('jquery')
    , _ = require('lodash')
    , Kefir = require('kefir')
-   , Rickshaw = require('rickshaw')
    , dateSelector = require('./src/dateSelector.js')
    , spireAPI = require('./src/spireAPI.js')
    , windowed = require('./src/windowed.js')
-   , unixTime = require('unix-timestamp')
-   , append = function (html) {$(document.body).append(html)}
-   , empty = function (querySelector) {$(querySelector).empty()}
-
-var drawGraph = function (data, querySelector) {
-  //empty the div
-  empty(querySelector)
-  //graph
-  var g = new Rickshaw.Graph({
-    element: document.querySelector(querySelector),
-    renderer:'bar',
-    height: 150, 
-    series: [{
-      color:'steelblue',
-      data: data,
-    }],
-  })
-  g.render()  
-  //hover detail
-  var hoverDetail = new Rickshaw.Graph.HoverDetail({
-    graph: g,
-    xFormatter: unixTime.toDate
-  })
-  g.update()
-}
-
+   , BarGraph = require('./src/barGraph.js')
 
 var setup = function() {
   //streams
-  dateSelectionStream = dateSelector(document)
+  dateSelectionStream = dateSelector()
   spireDataStream = dateSelectionStream.flatMapLatest(spireAPI)
   //setup
-  append('<div id="graph1"></div>')
-  append('<div id="graph2"></div>')
-  append('<div id="graph3"></div>')
+  drawGraph1 = BarGraph('graph1')
+  drawGraph2 = BarGraph('graph2')
+  drawGraph3 = BarGraph('graph3')
   //side effects
   dateSelectionStream.log('fetching') // 'loading spinner'
   spireDataStream.onValue (function (d) {
@@ -49,9 +23,9 @@ var setup = function() {
     var w2 = windowed(timeseries, 200) // mid-res breath data
     var w3 = windowed(timeseries, 500) // lo-res breath data
     // draw graph
-    drawGraph(w1, '#graph1')
-    drawGraph(w2, '#graph2')
-    drawGraph(w3, '#graph3')
+    drawGraph1(w1)
+    drawGraph2(w2)
+    drawGraph3(w3)
   })
 
 }
