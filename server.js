@@ -13,7 +13,9 @@ app.use(cors());
 app.use(express.static(publicDir))
 
 var spireToken = '14724763f3541cb6c7bbac74f920836f502faa724406e4c6a5642e996366b31a'
-var url = 'https://app.spire.io//api/events/br?date=2015-07-16&access_token=' + spireToken;
+var queryURL =  function (dateString) {
+  return 'https://app.spire.io//api/events/br?date=' + dateString + '&access_token=' + spireToken;
+}
 
 app.get('/', function (req, res) {
   read('index.html').pipe(res)
@@ -21,8 +23,10 @@ app.get('/', function (req, res) {
 
 app.get('/breath', function (req, res) {
   res.writeHead(200);
+  var url = queryURL(req.query.date)
   console.log('making get request to ', url)
   https.get(url, function (apiRes) {
+    console.log('got response from', url)
     apiRes.pipe(res)
   }).on('error', logError)
 });
