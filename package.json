@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "build": "watchify app/index.js -o bundle.js"
+    "build": "watchify app/index.js -o dist/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "express": "^4.13.3",
     "jquery": "^2.1.4",
     "kefir": "^2.7.2",
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "rickshaw": "^1.5.1"
   }
 }

@@ -6,15 +6,13 @@ var mean = function (coll, key) {
 
 var averageReading = function (coll) {
  return {
-   timestamp:  mean(coll, 'timestamp'),
-   value:      mean(coll, 'value'),
+   x:  mean(coll, 'timestamp'),
+   y:  mean(coll, 'value'),
  }
 }
 
 var windowed = function (timeseries, windowSize) {
- return _.chain(timeseries).chunk(windowSize)
-                           .map(averageReading)
-                           .value()
+ return _.chain(timeseries).chunk(windowSize).map(averageReading).value()
 }
 
 module.exports = windowed

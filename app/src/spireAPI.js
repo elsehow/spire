@@ -16,14 +16,14 @@ var ajax = function (options) {
 
 //returns a promise for a GET to the query string
 var queryOpts = function (type, date) {
-   var url = 'http://localhost:3000/breath'
+   var url = 'http://127.0.0.1:3000/breath'
    return { url: url  }
 }
 
 //returns a stream* from responses to query()'s AJAX request
 var getData = function (date) {
   var responseStream = ajax(queryOpts('br',date))
-  return responseStream
+  return responseStream.map(JSON.parse)
 }
 
 module.exports = getData
