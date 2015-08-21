@@ -2,12 +2,10 @@
 var $ = require('jquery')
   , Kefir = require('kefir')
   , dateSelector = require('./src/dateSelector.js')
+  , Tooltip = require('./src/tooltip.js')
   , spireAPI = require('./src/spireAPI.js')
   , windowed = require('./src/windowed.js')
   , barGraph = require('./src/barGraph.js')
-  , map = function (num, in_min, in_max, out_min, out_max) {
-      return (num- in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-    }
 
 var setup = function() {
   //streams
@@ -20,6 +18,7 @@ var setup = function() {
   dateSelectionStream.onValue(function (date) {
     $graphsContainer.html('loading ' + date)
   })
+  // setup graphs
   spireDataStream.onValue (function (d) {
     var timeseries = d['data']
     // clear loading screen
@@ -28,35 +27,18 @@ var setup = function() {
     var w1 = windowed(timeseries, 50) // hi-res breath data
     var w2 = windowed(timeseries, 200) // mid-res breath data
     var w3 = windowed(timeseries, 500) // lo-res breath data
-    // draw graph
+    // draw graphs
     barGraph(w1, $graphsContainer)
     barGraph(w2, $graphsContainer)
     barGraph(w3, $graphsContainer)
   })
   // setup tooltip
-  $(document.body).prepend('<div id = "time-tooltip"></div>')
-  spireDataStream.map(function (d) {
-    return {
-      from: d['metadata']['from'],
-      to:   d['metadata']['to']
-    }
-  }).onValue(function (range) {
-     var mouseXToTime =  function (ev) {
-       var cx = ev.clientX
-       var t = map(cx, 0, window.innerWidth, range.from, range.to)
-       return new Date(t*1000)
-     }
-     var mouseMoves = Kefir.fromEvents($graphsContainer, 'mousemove')
-                           .throttle(300)
-                           .map(mouseXToTime)
-     mouseMoves.onValue(function (t) { 
-       $('#time-tooltip').html(t)
-     })
-  })
+  Tooltip(spireDataStream, $graphsContainer)
+
 }
 $(document).on('ready', setup)
 
-},{"./src/barGraph.js":2,"./src/dateSelector.js":3,"./src/spireAPI.js":4,"./src/windowed.js":5,"jquery":6,"kefir":7}],2:[function(require,module,exports){
+},{"./src/barGraph.js":2,"./src/dateSelector.js":3,"./src/spireAPI.js":4,"./src/tooltip.js":5,"./src/windowed.js":6,"jquery":7,"kefir":8}],2:[function(require,module,exports){
 var  $        = require('jquery')
    , Rickshaw = require('rickshaw')
    , unixTime = require('unix-timestamp')
@@ -79,7 +61,7 @@ var setup = function (data, $parent) {
 
 module.exports = setup 
 
-},{"jquery":6,"make-random-string":9,"rickshaw":12,"unix-timestamp":13}],3:[function(require,module,exports){
+},{"jquery":7,"make-random-string":10,"rickshaw":13,"unix-timestamp":14}],3:[function(require,module,exports){
 var $ = require('jquery')
 var Kefir = require('kefir')
 var append = function (html) {$(document.body).append(html)}
@@ -101,7 +83,7 @@ var setup = function (doc) {
 
 module.exports = setup
 
-},{"jquery":6,"kefir":7}],4:[function(require,module,exports){
+},{"jquery":7,"kefir":8}],4:[function(require,module,exports){
 var $ = require('jquery')
 var Kefir = require('kefir')
 
@@ -135,7 +117,47 @@ var getData = function (date) {
 
 module.exports = getData
 
-},{"jquery":6,"kefir":7}],5:[function(require,module,exports){
+},{"jquery":7,"kefir":8}],5:[function(require,module,exports){
+var $ = require('jquery')
+  , Kefir = require('kefir')
+  , map = function (num, in0, in1, out0, out1) {return (num- in0) * (out1 - out0) / (in1 - in0) + out0 }
+
+setup = function (dataStream, $graphsContainer) {
+  //setup
+  $(document.body).append('<div id = "time-tooltip"></div>')
+  
+  //setup
+  var $tooltip = $('#time-tooltip')
+  var mousemoves = Kefir.fromEvents($graphsContainer, 'mousemove').throttle(25)
+
+  //hide+show tooltip
+  $graphsContainer.mouseover(function () { $tooltip.show() })
+  $graphsContainer.mouseout(function () { $tooltip.hide() })
+
+  // whenever new data comes in 
+  dataStream.map(function (d) {
+    // get a time range by extracting d.metadata.from/to
+    return {
+      from: d['metadata']['from'],
+      to:   d['metadata']['to']
+    }
+  // now that we have the daterange, we can setup the tooltip
+  }).onValue(function (timerange) {
+     var width = $graphsContainer.width()
+     var mouseXToTime =  function (ev) {
+       var t = map(ev.clientX, 0, width, timerange.from, timerange.to)
+       return new Date(t*1000)
+     }
+     var setTooltip = function (t) { 
+       $('#time-tooltip').html(t)
+     }
+     //map the X position of the mouse to a time in the timerange
+     mousemoves.map(mouseXToTime).onValue(setTooltip)
+  })
+}
+
+module.exports = setup
+},{"jquery":7,"kefir":8}],6:[function(require,module,exports){
 var _ = require('lodash')
 
 var mean = function (coll, key) {
@@ -155,7 +177,7 @@ var windowed = function (timeseries, windowSize) {
 
 module.exports = windowed
 
-},{"lodash":8}],6:[function(require,module,exports){
+},{"lodash":9}],7:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
@@ -9367,7 +9389,7 @@ return jQuery;
 
 }));
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*! Kefir.js v2.7.2
  *  https://github.com/rpominov/kefir
  */
@@ -14405,7 +14427,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -26760,7 +26782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // Generated by CoffeeScript 1.8.0
 (function() {
   var randomString;
@@ -26790,7 +26812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 d3 = function() {
   var d3 = {
     version: "3.3.13"
@@ -36084,12 +36106,12 @@ d3 = function() {
   });
   return d3;
 }();
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 require("./d3");
 module.exports = d3;
 (function () { delete this.d3; })(); // unset global
 
-},{"./d3":10}],12:[function(require,module,exports){
+},{"./d3":11}],13:[function(require,module,exports){
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(['d3'], function (d3) {
@@ -40159,7 +40181,7 @@ Rickshaw.Series.FixedDuration = Rickshaw.Class.create(Rickshaw.Series, {
 	return Rickshaw;
 }));
 
-},{"d3":11}],13:[function(require,module,exports){
+},{"d3":12}],14:[function(require,module,exports){
 /**
  * Tiny library to create and manipulate Unix timestamps
  * (i.e. defined as the number of seconds since Unix epoch time).
