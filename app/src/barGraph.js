@@ -1,37 +1,21 @@
 var  $        = require('jquery')
    , Rickshaw = require('rickshaw')
    , unixTime = require('unix-timestamp')
-   , append   = function (html) {$(document.body).append(html)}
-   , empty    = function (querySelector) {$(querySelector).empty()}
+   , randomString = require('make-random-string')
 
-module.exports = function (divID) {
-
-  // draw container to document
-  append('<div id="' + divID + '"></div>')
-
-  // make a function that draws a graph of data to the container
-  var drawGraph = function (data) {
-    var selector = '#' + divID
-    //empty the div
-    empty(selector)
-    //graph
-    var g = new Rickshaw.Graph({
-      element: document.querySelector(selector),
-      renderer:'bar',
-      height: 150, 
-      series: [{
-        color:'steelblue',
-        data: data,
-      }],
-    })
-    g.render()  
-    //hover detail
-    var hoverDetail = new Rickshaw.Graph.HoverDetail({
-      graph: g,
-      xFormatter: unixTime.toDate
-    })
-    g.update()
-  }
-
-  return drawGraph
+var setup = function (data, $parent) {
+  // put a div with a random ID in $parent
+  var divID = randomString(3)
+  $parent.append('<div id="' + divID + '"></div>')
+  var this_el = $('#' + divID).get(0) //needs to be a native html element
+  //rickshaw graph
+  var graph = new Rickshaw.Graph({
+    element: this_el,
+    renderer:'bar',
+    height: 150, 
+    series: [{color:'steelblue', data: data}],
+  })
+  graph.render()  
 }
+
+module.exports = setup 

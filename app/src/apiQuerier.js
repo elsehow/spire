@@ -15,7 +15,6 @@ var ajax = function (options) {
   }).take(1).endOnError().toProperty();
 }
 
-
 //returns a promise for a GET to the query string
 var queryOpts = function (type, date) {
    return { url: url }
