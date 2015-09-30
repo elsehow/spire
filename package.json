@@ -28,7 +28,6 @@
     "kefir": "^2.7.2",
     "lodash": "^3.10.1",
     "make-random-string": "^1.0.5",
-    "moment": "^2.10.6",
     "rickshaw": "^1.5.1"
   }
 }
