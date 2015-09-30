@@ -3,7 +3,7 @@ playing around with the spire API
 to use this
 
     npm start
-    npm run-script build
+    npm run watch
 
 navigate to localhost:3000
 

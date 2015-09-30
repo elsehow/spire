@@ -23,13 +23,13 @@ var setup = function() {
     // clear loading screen
     $graphsContainer.empty()
     // process data
+    var w0 = windowed(timeseries, 10) // hi-res breath data
     var w1 = windowed(timeseries, 50) // hi-res breath data
     var w2 = windowed(timeseries, 200) // mid-res breath data
-    var w3 = windowed(timeseries, 500) // lo-res breath data
     // draw graphs
+    barGraph(w0, $graphsContainer)
     barGraph(w1, $graphsContainer)
     barGraph(w2, $graphsContainer)
-    barGraph(w3, $graphsContainer)
   })
   // setup tooltip
   Tooltip(spireDataStream, $graphsContainer)
