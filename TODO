@@ -1,9 +1,27 @@
-hover tip for time should be canvas-wide
+
+
+
+how to establish a global min/max time?
+
+how to deploy ESMS system, which works?
+
+
+
+
+
+..
+does it "work" (look good)?
+are times really synchronized?
+refactor
+
+
+
+
+
+
+
 there should be a global max/min time
 everything should be drawn to that scale
-
 drag and delete graphs
-
 moves would be good too
-so would my api
 keep goin on it

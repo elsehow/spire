@@ -25,23 +25,23 @@ app.get('/', function (req, res) {
 })
 
 // DEBUG
-app.get('/breath', function (req, res) {
-  res.writeHead(200);
-  res.end(mockAPIresp.spire)
-})
+// app.get('/breath', function (req, res) {
+//   res.writeHead(200);
+//   res.end(mockAPIresp.spire)
+// })
 app.get('/sms', function (req, res) {
   res.writeHead(200);
   res.end(mockAPIresp.esms)
 })
-// app.get('/breath', function (req, res) {
-//   res.writeHead(200);
-//   var url = queryURL(req.query.date)
-//   console.log('making get request to ', url)
-//   https.get(url, function (apiRes) {
-//     console.log('got response from', url)
-//     apiRes.pipe(res)
-//   }).on('error', logError)
-// });
+app.get('/breath', function (req, res) {
+  res.writeHead(200);
+  var url = queryURL(req.query.date)
+  console.log('making get request to ', url)
+  https.get(url, function (apiRes) {
+    console.log('got response from', url)
+    apiRes.pipe(res)
+  }).on('error', logError)
+});
 
 app.listen(3000, function() {
     console.log('CORS-enabled web server listening on port 3000');

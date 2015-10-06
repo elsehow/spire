@@ -6,38 +6,46 @@ var $ = require('jquery')
   , esmsAPI = require('./src/esmsAPI.js')
   , windowed = require('./src/windowed.js')
   , barGraph = require('./src/barGraph.js')
+  , wordGraph = require('./src/wordGraph.js')
 
 var setup = function() {
   //streams
   //var dateSelectionStream = dateSelector()
   // TODO DEBUG
-  var dateSelectionStream = Kefir.constant('garbage nonsense for now')
+  var dateSelectionStream = Kefir.constant('2015-09-30')
   var spireData           = dateSelectionStream.flatMapLatest(spireAPI)
   var esmsData            = dateSelectionStream.flatMapLatest(esmsAPI)
+  var anyData             = Kefir.merge([spireData, esmsData])
 
   //setup
+  $(document.body).append('<div id = "loadingMessage"></div>')
   $(document.body).append('<div id = "graphsContainer"></div>')
   var $graphsContainer = $('#graphsContainer')
-  //side effects
-  dateSelectionStream.onValue(function (date) {
-    $graphsContainer.html('loading ' + date)
-  })
-  // setup breathing graphs
-  spireData.onValue (function (d) {
+  var $loadingMessage = $('#loadingMessage')
+  // loading stuff
+  var set_loading_msg = function (date) {
+    $loadingMessage.html('loading ' + date)
+  }
+  var clear_loading_msg = function () {
+    $loadingMessage.empty()
+  }
+  // graphing stuff
+  var breath_graph = function (d) {
     var timeseries = d['data']
-    // clear loading screen
-    $graphsContainer.empty()
-    // process data
-    var w0 = windowed(timeseries, 1) // hi-res breath data
-    var w1 = windowed(timeseries, 10) // hi-res breath data
-    // draw graphs
-    barGraph(w0, $graphsContainer)
-    barGraph(w1, $graphsContainer)
-  })
-  // setup sms graphs
-  esmsData.log('esms!!')
+    barGraph(windowed(timeseries,1), $graphsContainer)
+  }
+  var sms_graph = function (d) { wordGraph(d, $graphsContainer) }
+
+  // side effects
+  // loading stuff
+  dateSelectionStream.onValue(set_loading_msg)
+  anyData.onValue(clear_loading_msg)
+  // grapihng stuff
+  spireData.onValue(breath_graph)
+  esmsData.onValue(sms_graph)
+
   // setup tooltip
-  Tooltip(spireData, $graphsContainer)
+  // Tooltip(spireData, $graphsContainer)
 
 }
 $(document).on('ready', setup)
