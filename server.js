@@ -16,8 +16,18 @@ app.use(express.static(publicDir))
 
 //var phoneNumber = '+13108017846'
 var spireToken = '14724763f3541cb6c7bbac74f920836f502faa724406e4c6a5642e996366b31a'
-var queryURL =  function (dateString) {
-  return 'https://app.spire.io//api/events/br?date=' + dateString + '&access_token=' + spireToken;
+var queryURL =  function (type, dateString) {
+  return 'https://app.spire.io//api/' + type + '?date=' + dateString + '&access_token=' + spireToken;
+}
+
+function getSpireAPI (type,req, res) {
+  res.writeHead(200);
+  var url = queryURL(type, req.query.date)
+  console.log('making get request to ', url)
+  https.get(url, function (apiRes) {
+    console.log('got response from', url)
+    apiRes.pipe(res)
+  }).on('error', logError)
 }
 
 app.get('/', function (req, res) {
@@ -34,13 +44,11 @@ app.get('/sms', function (req, res) {
   res.end(mockAPIresp.esms)
 })
 app.get('/breath', function (req, res) {
-  res.writeHead(200);
-  var url = queryURL(req.query.date)
-  console.log('making get request to ', url)
-  https.get(url, function (apiRes) {
-    console.log('got response from', url)
-    apiRes.pipe(res)
-  }).on('error', logError)
+	getSpireAPI('events/br', req, res)
+});
+
+app.get('/streaks', function (req, res) {
+	getSpireAPI('streaks', req, res)
 });
 
 app.listen(3000, function() {

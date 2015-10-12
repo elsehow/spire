@@ -1,17 +1,21 @@
 
 
 
+
+how to deploy esms?
+
+
+deploy esms
+collect spire+eeg data
+in a 'vacuum' (kefir.ajax?)
+	, send a date-based request...
+	, establish minimum+maximum times....
+
+
 how to establish a global min/max time?
-
-how to deploy ESMS system, which works?
-
-
-
-
-
-..
-does it "work" (look good)?
+...
 are times really synchronized?
+does it "work" (look good)?
 refactor
 
 
@@ -20,8 +24,7 @@ refactor
 
 
 
-there should be a global max/min time
-everything should be drawn to that scale
+there should be a global timescale...
 drag and delete graphs
-moves would be good too
+would be cool to play with moves...just in general
 keep goin on it

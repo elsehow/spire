@@ -1,4 +1,4 @@
-var apiQuerier = require('./apiQuerier.js')
+var kefirAjax = require('kefir-jquery-ajax')
 
 //returns a promise for a GET to the query string
 var queryOpts = function (date, number) {
@@ -11,7 +11,7 @@ var queryOpts = function (date, number) {
 
 //returns a stream* from responses to query()'s AJAX request
 var getData = function (date, number) {
-  var responseStream = apiQuerier(queryOpts(date, "my-phone-number"))
+  var responseStream = kefirAjax(queryOpts(date, "my-phone-number"))
   return responseStream.map(JSON.parse)
 }
 
