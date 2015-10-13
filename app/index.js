@@ -1,5 +1,5 @@
 var _ = require('lodash')
-  $ = require('jquery')
+  , $ = require('jquery')
   , Kefir = require('kefir')
   , dateSelector = require('./src/dateSelector.js')
   , Tooltip = require('./src/tooltip.js')
@@ -10,24 +10,22 @@ var _ = require('lodash')
   , streaksGraph = require('./src/streaksGraph.js')
 
 // TODO
-// make a graph for streaks
-// figure out why not all SMSs show up in API...
+// Fix weird day rollover issue for SMS (hint: +/- 24h)
+// draw streaks graph................   (hint: if it were p5)
 
 var setup = function() {
 
-  //setup
+  // set up the dOm
   $(document.body).append('<div id = "loadingMessage"></div>')
   $(document.body).append('<div id = "graphsContainer"></div>')
   var $graphsContainer = $('#graphsContainer')
 	var $loadingMessage = $('#loadingMessage')
-  // loading stuff
-  function set_loading_msg (date) { 
+  function setLoadingMessage (date) { 
 		$loadingMessage.html('loading ' + date + '...') 
 	}
-  function clear_loading_msg () { 
+  function clearLoadingMessage () { 
 		$loadingMessage.empty() 
 	}
-  // graphing stuff
   function breathGraph (d, start, end) {
     var timeseries = _.map(d['data'], function (d) {
 			return {y: d.value, x: d.timestamp}
@@ -35,13 +33,17 @@ var setup = function() {
     barGraph(timeseries, start, end, $graphsContainer)
   }
   function esmsGraph (d, start, end) { 
-		 console.log('sanitcheck', start, end)
 		wordGraph(d, start, end, $graphsContainer) 
 	}
   function streaksGraph (d, start, end) { 
 		streaksGraph(d, start, end, $graphsContainer) 
 	}
-	var globalTimerange = function (dataObj) {
+
+	// takes an object of {breath, strekas, esms}
+	// maps each (uniquely formatted) dataset
+	// and finding the global max + min times for all datasets
+	// returns an object of {start, end}, where both are UNIX times
+	function globalTimerange (dataObj) {
 		function range (start, end) {
 			return {start: start, end: end}
 		}
@@ -60,6 +62,9 @@ var setup = function() {
 			, streaks_timerange(dataObj.streaks)
 			, esms_timerange(dataObj.esms)
 		]
+		// returns an object {start, end}
+		// where `start` is the minimum start date of all objections
+		// and `end` is the maximum end date of all objects 
 		return range(
 				_.min(_.pluck(ranges,'start'))
 				, _.max(_.pluck(ranges,'end')))
@@ -72,47 +77,37 @@ var setup = function() {
   var breathData          = dateSelectionStream.flatMapLatest(spireAPI.breath)
   var streaksData         = dateSelectionStream.flatMapLatest(spireAPI.streaks)
   var esmsData            = dateSelectionStream.flatMapLatest(esmsAPI)
-	var allData             = Kefir.combine(
-			                        [breathData,streaksData, esmsData]
-															, function (b, s, e) {
-		                              return { breath: b
-														      	     , esms: e
-		                                     , streaks: s }
-														 	  }
-														)
-	
+
 	// produce `rangedData`, an object with all sensor data 
 	// + a fields `start` `stop`, representing the global timerange of all other data
 	// format: 
 	//
 	//   { breath, esms, streks, start, end }
 	//
-	 var timerange = allData.map(globalTimerange)
-	 var rangedData= allData.combine(timerange, function (dataObj, t) {
-		 return _.extend(dataObj, t)
-	 })
+	var allData    = Kefir.combine(
+			               [breathData,streaksData, esmsData]
+						 	   	, function (b, s, e) {
+		                     return { breath: b
+						 	         	          , esms: e
+		                              , streaks: s }
+									})
+  var timerange  = allData.map(globalTimerange)
+	var rangedData = allData.combine(timerange, _.extend)
 
-	 esmsData.log('esms')
 
 	// side effects
-	 rangedData.onValue(function (d) {
-		 function graphWith(fn, data) {
+  esmsData.log('esms') // DEBUG
+  dateSelectionStream.onValue(setLoadingMessage)
+  rangedData.onValue(function (d) {
+		function drawWith(fn, data) {
 			 fn(data, d.start, d.end)
 		 }
-	   graphWith(breathGraph, d.breath)
-     graphWith(esmsGraph,d.esms)
-	//   graphWith(streaksGraph,d.streaks)
-	 })
-  dateSelectionStream.onValue(set_loading_msg)
-  allData.onValue(clear_loading_msg)
+	   drawWith(breathGraph, d.breath)
+     drawWith(esmsGraph,d.esms)
+	//   drawWith(streaksGraph,d.streaks)
+	//   drawWith(Tooltip, null)
+	})
+  allData.onValue(clearLoadingMessage)
 	
-	//  OLD-- 
-	//  breathData.onValue(breath_graph)
-	//  esmsData.onValue(sms_graph)
-	//	streaksData.onValue(streaks_graph)
-
-  // setup tooltip
-  // Tooltip(breathData, $graphsContainer)
-
 }
 $(document).on('ready', setup)
