@@ -1,4 +1,5 @@
 var https = require('https')
+  , http = require('http')
   , express = require('express')
   , cors = require('cors')
   , app = express()
@@ -10,45 +11,58 @@ var https = require('https')
   , logError = function(e) { console.error(e.message) }
   // DEBUG
   , mockAPIresp = require('./test/mockAPIresponses.js')
+  , spireToken = '14724763f3541cb6c7bbac74f920836f502faa724406e4c6a5642e996366b31a'
 
-app.use(cors());
-app.use(express.static(publicDir))
-
-//var phoneNumber = '+13108017846'
-var spireToken = '14724763f3541cb6c7bbac74f920836f502faa724406e4c6a5642e996366b31a'
-var queryURL =  function (type, dateString) {
+var spireQueryURL =  function (type, dateString) {
   return 'https://app.spire.io//api/' + type + '?date=' + dateString + '&access_token=' + spireToken;
 }
 
-function getSpireAPI (type,req, res) {
+var esmsQueryURL = function (from, date) {
+  return 'http://esms.cosmopol.is/q?from='+from+'&date=?'+date
+}
+
+function get (module, url, req, res) {
   res.writeHead(200);
-  var url = queryURL(type, req.query.date)
   console.log('making get request to ', url)
-  https.get(url, function (apiRes) {
+  module.get(url, function (apiRes) {
     console.log('got response from', url)
     apiRes.pipe(res)
   }).on('error', logError)
 }
 
+function httpsGet (url, req, res) {
+	return get(require('https'), url, req, res)
+}
+
+function httpGet (url, req, res) {
+	return get(require('http'), url, req, res)
+}
+
+function getEsmsAPI (req, res) {
+	apiGetReq(url, req, res)
+}
+
+app.use(cors());
+
+app.use(express.static(publicDir))
+
 app.get('/', function (req, res) {
   read('index.html').pipe(res)
 })
 
-// DEBUG
-// app.get('/breath', function (req, res) {
-//   res.writeHead(200);
-//   res.end(mockAPIresp.spire)
-// })
-app.get('/sms', function (req, res) {
-  res.writeHead(200);
-  res.end(mockAPIresp.esms)
+app.get('/esms', function (req, res) {
+  var url = esmsQueryURL(req.query.from, req.query.date)
+	httpGet(url, req, res)
 })
+
 app.get('/breath', function (req, res) {
-	getSpireAPI('events/br', req, res)
+  var url = spireQueryURL('events/br', req.query.date)
+	httpsGet(url, req, res)
 });
 
 app.get('/streaks', function (req, res) {
-	getSpireAPI('streaks', req, res)
+  var url = spireQueryURL('streaks', req.query.date)
+	httpsGet(url, req, res)
 });
 
 app.listen(3000, function() {
