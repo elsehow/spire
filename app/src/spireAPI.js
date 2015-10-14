@@ -36,9 +36,9 @@ function filterForDate (date) {
 
 module.exports = {
   breath: function (date) { 
-		return getData('br', date) 
-	}
+    return getData('br', date) 
+  }
   , streaks: function (date) { 
-			return getData('streaks', date).map(filterForDate(date))
-	}
+    return getData('streaks', date).map(filterForDate(date))
+  }
 }

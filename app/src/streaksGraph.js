@@ -5,19 +5,19 @@ var _ = require('lodash')
 var setup = function (streaksApiData, start, end, $parent) {
 
   $parent.append('<div id="streaksTimeline"></div>')
-  var width = 900 // TODO bad magic number
+  var width = $parent.width() // TODO bad magic number
   var height = 300  // TODO ditto magic numbers BADBADBAD
 	var barHeight = 30
   var scaleTime = function (t) {
-    return (t*1000 - start) / (end-start) * (width - 300)
+    return (t*1000 - start) / (end-start) * width
   }
 
 	function color (t) {
-		if (t==="tense") return    '#FD7400'  //'#D92525' // '#f00' //red 
-		if (t==="calm") return     '#004358'  // #040DBF' // '#0f0' // blue 
-		if (t==="focus") return    '#BEDB39'  //'#88A61B' // '#00f' //green
-		if (t==="activity") return '#FFE11A'  //'#F29F05' // '#ff0' // yellow
-		if (t==="inactive") return '#eee'  // gray
+		if (t==="tense")    return  '#FD7400'  //'#D92525' // '#f00' //red 
+		if (t==="calm")     return  '#004358'  // #040DBF' // '#0f0' // blue 
+		if (t==="focus")    return  '#BEDB39'  //'#88A61B' // '#00f' //green
+		if (t==="activity") return  '#FFE11A'  //'#F29F05' // '#ff0' // yellow
+		if (t==="inactive") return  '#eee'  
 	}
 
 	function yPos(t) {
@@ -52,7 +52,7 @@ var setup = function (streaksApiData, start, end, $parent) {
 //			, barWidth(d.start_at, d.stop_at))
 //  })
 
-	function drawBarFlat (draw, color, yPos, xPos, width) {
+	function drawBarFlat (draw, color, xPos, width) {
 		draw.rect(width,barHeight)
 			  .fill({color:color})
 				.move(xPos,0)
@@ -63,7 +63,6 @@ var setup = function (streaksApiData, start, end, $parent) {
 		drawBarFlat(
 			drawCtx // svg drawing context
 			, color(d.type)  // color is a fn of data type (focus/tense/etc)
-			, yPos(d.type) // y pos is also a fn of data type
 			, xPos(d.start_at)
 			, barWidth(d.start_at, d.stop_at))
   })

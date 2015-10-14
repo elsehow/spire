@@ -8,7 +8,7 @@ setup = function (start, end, $graphsContainer) {
   //setup
   $(document.body).append('<div id = "time-tooltip"></div>')
   var $tooltip = $('#time-tooltip')
-  var containerWidth = $graphsContainer.width()
+  var containerWidth = $(window).width()
 	var height = 40
 
 	function clientX (ev) {
@@ -16,7 +16,7 @@ setup = function (start, end, $graphsContainer) {
 	}
 
 	function xToTime (x) {
-    var t = map(x, 0, containerWidth, start, end)
+    var t = map(x, 5, containerWidth, start, end)
     return new Date(t)
 	}
 

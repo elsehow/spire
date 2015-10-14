@@ -7,10 +7,10 @@ var setup = function (data, start, end, $parent) {
   $parent.append('<div id="smsTimeline"></div>')
   $parent.append('<div id="smsMediaTimeline"></div>')
 
-  var width = 900 // TODO bad magic number
+  var width = $parent.width()// TODO bad magic number
   var height = 300  // TODO ditto magic numbers BADBADBAD
   var scale_time = function (d) {
-    return (d.timestamp - start) / (end-start) * (width - 300)
+    return (d.timestamp - start) / (end-start) * width 
   }
 
 	// draw SMS

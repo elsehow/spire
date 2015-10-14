@@ -17,7 +17,6 @@ problems:
 - DOM management ,, ?  i have all these jquery selectors, and thats lame
 
 
-
 questions:
 
 - does UNIX epoch have a timezone?
@@ -31,12 +30,28 @@ questions:
   what are possible points of impercision?
 
 
-
 solve those too@!
 
+orders of investigation:
+
+- how are times formatted from Spire API?
+  how are times formatted from ESMs API?
+  hopefully they are identical by the time they hit index.js!
+
+- how do pixels map to UNIX times?
+  what are sources of imprecision?
+
+- what is the relationship between DOM and state? 
+  when is DOM being rendered? how is it generated?
 
 
-sugar:
+
+
+
+
+
+wishlist:
+  paper version
   global timescale at the bottom st
   drag and delete graphs
   would be cool to play with moves...just in general

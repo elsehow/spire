@@ -35,7 +35,7 @@ var setup = function() {
   function esmsGraph (d, start, end) { 
 		wordGraph(d, start, end, $graphsContainer) 
 	}
-  function streaksGraph (d, start, end) { 
+  	function streaksGraph (d, start, end) { 
 		flowGraph(d, start, end, $graphsContainer) 
 	}
 	function tooltip(_, start, end) {
@@ -76,7 +76,7 @@ var setup = function() {
   //streams
   // TODO DEBUG
   //var dateSelectionStream = dateSelector()
-  var dateSelectionStream = Kefir.constant('2015-10-12')
+  var dateSelectionStream = Kefir.constant('2015-10-14')
   var breathData          = dateSelectionStream.flatMapLatest(spireAPI.breath)
   var streaksData         = dateSelectionStream.flatMapLatest(spireAPI.streaks)
   var esmsData            = dateSelectionStream.flatMapLatest(esmsAPI)
@@ -89,11 +89,11 @@ var setup = function() {
 	//
 	var allData    = Kefir.combine(
 			               [breathData,streaksData, esmsData]
-						 	   	, function (b, s, e) {
-		                     return { breath: b
-						 	         	          , esms: e
-		                              , streaks: s }
-									})
+                                       , function (b, s, e) {
+		                         return { breath: b
+                                                , esms: e
+		                                , streaks: s }
+                                       })
   var timerange  = allData.map(globalTimerange)
 	var rangedData = allData.combine(timerange, _.extend)
 
