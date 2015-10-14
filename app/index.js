@@ -2,12 +2,12 @@ var _ = require('lodash')
   , $ = require('jquery')
   , Kefir = require('kefir')
   , dateSelector = require('./src/dateSelector.js')
-  , Tooltip = require('./src/tooltip.js')
   , spireAPI = require('./src/spireAPI.js')
   , esmsAPI = require('./src/esmsAPI.js')
   , barGraph = require('./src/barGraph.js')
   , wordGraph = require('./src/wordGraph.js')
-  , streaksGraph = require('./src/streaksGraph.js')
+  , flowGraph = require('./src/streaksGraph.js')
+  , Tooltip = require('./src/tooltip.js')
 
 // TODO
 // Fix weird day rollover issue for SMS (hint: +/- 24h)
@@ -36,7 +36,10 @@ var setup = function() {
 		wordGraph(d, start, end, $graphsContainer) 
 	}
   function streaksGraph (d, start, end) { 
-		streaksGraph(d, start, end, $graphsContainer) 
+		flowGraph(d, start, end, $graphsContainer) 
+	}
+	function tooltip(_, start, end) {
+		Tooltip(start, end, $graphsContainer)
 	}
 
 	// takes an object of {breath, strekas, esms}
@@ -96,16 +99,16 @@ var setup = function() {
 
 
 	// side effects
-  esmsData.log('esms') // DEBUG
+  // esmsData.log('esms') // DEBUG
   dateSelectionStream.onValue(setLoadingMessage)
   rangedData.onValue(function (d) {
-		function drawWith(fn, data) {
-			 fn(data, d.start, d.end)
-		 }
-	   drawWith(breathGraph, d.breath)
-     drawWith(esmsGraph,d.esms)
-	//   drawWith(streaksGraph,d.streaks)
-	//   drawWith(Tooltip, null)
+    function drawWith(fn, data) {
+ 	   fn(data, d.start, d.end)
+    }
+    drawWith(breathGraph, d.breath);
+    drawWith(streaksGraph,d.streaks);
+    drawWith(esmsGraph,d.esms);
+	  drawWith(tooltip, null)
 	})
   allData.onValue(clearLoadingMessage)
 	

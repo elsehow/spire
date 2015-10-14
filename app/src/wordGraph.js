@@ -21,7 +21,7 @@ var setup = function (data, start, end, $parent) {
 	  // draw text body
     draw.text(d.body).move(x,y)
 		// draw a line from the point of the SMS up
-		draw.line(x,y,x,0).stroke({width:1, color:'#aaa'})
+		draw.line(x,y,x,0).stroke({width:1, color:'#eee'})
 		//console.log('sms', x, d.body)
   })
 

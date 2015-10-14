@@ -2,66 +2,73 @@ var _ = require('lodash')
     , $ = require('jquery')
     , SVG = require('svg.js')
 
-//  // takes an array of data from the ESMS api
-//  // returns a list of objects that look like
-//  // { body, timestamp, media} 
-//  // sorted by timestamp
-//  var process = function (data) {
-//    // get sms bodies
-//    var bodies = _.pluck(data, "Body")
-//    // get SMS times
-//    var times = _.map(data, function (d) {
-//      console.log(new Date(d.ReceivedAt.epoch_time*1000))
-//      return d.ReceivedAt.epoch_time
-//    })
-//    // get any media in the SMSs
-//    var media = _.pluck(data, "MediaUrl0")
-//    var z = _.map(
-//      _.zip(bodies, times, media)
-//      , function (d) {
-//        return {body: d[0], timestamp: d[1], media:d[2]}
-//      })
-//    return _.sortBy(z, 'timestamp')
-//  }
+var setup = function (streaksApiData, start, end, $parent) {
 
-var setup = function (streaksApiData, $parent) {
   $parent.append('<div id="streaksTimeline"></div>')
+  var width = 900 // TODO bad magic number
+  var height = 300  // TODO ditto magic numbers BADBADBAD
+	var barHeight = 30
+  var scaleTime = function (t) {
+    return (t*1000 - start) / (end-start) * (width - 300)
+  }
 
-	// TODO - weirdly, this API is global wrt time, so we need to filter list by time ourselves
+	function color (t) {
+		if (t==="tense") return    '#FD7400'  //'#D92525' // '#f00' //red 
+		if (t==="calm") return     '#004358'  // #040DBF' // '#0f0' // blue 
+		if (t==="focus") return    '#BEDB39'  //'#88A61B' // '#00f' //green
+		if (t==="activity") return '#FFE11A'  //'#F29F05' // '#ff0' // yellow
+		if (t==="inactive") return '#eee'  // gray
+	}
 
-	// filter into four types:
-	var calm = _.filter(streaksApiData, {type:'calm'})
-	var focus = _.filter(streaksApiData, {type:'focus'})
-	var tense = _.filter(streaksApiData, {type:'tense'})
-	var activity = _.filter(streaksApiData, {type:'activity'})
-	var inactive = _.filter(streaksApiData, {type:'inactive'})
-	console.log('tense?', tense)
+	function yPos(t) {
+		if (t==="tense") return 0
+		if (t==="calm") return 2*barHeight
+		if (t==="focus") return 3*barHeight
+		if (t==="activity") return 4*barHeight
+		if (t==="inactive") return 5*barHeight
+	}
 
+	function xPos(startTime) {
+		return scaleTime(startTime)
+	}
+
+	function barWidth (startTime, endTime) {
+		return scaleTime(endTime) - scaleTime(startTime)
+	}
+
+//	function drawBar (draw, color, yPos, xPos, width) {
+//		draw.rect(width,barHeight)
+//			  .fill({color:color})
+//				.move(xPos,yPos)
+//	}
 //
-//  var tmin = _.first(data).timestamp
-//  var tmax = _.last(data).timestamp
-//  var width = 900 // TODO bad magic number
-//  var height = 300  // TODO ditto magic numbers BADBADBAD
-//  var scale_time = function (d) {
-//    return (d.timestamp - tmin) / (tmax-tmin) * (width - 300)
-//  }
-//
-//  var draw = SVG('smsTimeline').size(width,100)
-//  data.forEach(function (d, i) {
-//    var x = scale_time(d)
-//    var y = 30 * (i % 4) + 15;
-//    var text = draw.text(d.body).move(x,y)
+//  var drawCtx = SVG('streaksTimeline').size(width,180)
+//  streaksApiData.forEach(function (d) {
+//		drawBar(
+//			drawCtx // svg drawing context
+//			, color(d.type)  // color is a fn of data type (focus/tense/etc)
+//			, yPos(d.type) // y pos is also a fn of data type
+//			, xPos(d.start_at)
+//			, barWidth(d.start_at, d.stop_at))
 //  })
-//
-//  // draw only those sms's that have media attachments
-//  draw = SVG('smsMediaTimeline').size(width,height)
-//  mediaData = _.filter(data, 'media')
-//  mediaData.forEach(function (d, i) {
-//    var x = scale_time(d)
-//    if (d.media) draw.image(d.media).move(x,0).size(300,300)
-//  })
+
+	function drawBarFlat (draw, color, yPos, xPos, width) {
+		draw.rect(width,barHeight)
+			  .fill({color:color})
+				.move(xPos,0)
+	}
+
+  var drawCtx = SVG('streaksTimeline').size(width,barHeight)
+  streaksApiData.forEach(function (d) {
+		drawBarFlat(
+			drawCtx // svg drawing context
+			, color(d.type)  // color is a fn of data type (focus/tense/etc)
+			, yPos(d.type) // y pos is also a fn of data type
+			, xPos(d.start_at)
+			, barWidth(d.start_at, d.stop_at))
+  })
 }
-
+	
 module.exports = setup
 
 

@@ -13,7 +13,7 @@ var setup = function (data, start, end, $parent) {
     element: this_el,
     renderer:'bar',
     height: 150, 
-    series: [{color:'steelblue', data: data}],
+    series: [{color:'#004358', data: data}],
   })
   graph.render()  
 }
