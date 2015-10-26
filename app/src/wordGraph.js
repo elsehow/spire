@@ -18,11 +18,11 @@ var setup = function (data, start, end, $parent) {
   data.forEach(function (d, i) {
     var x = scale_time(d)
     var y = 30 * (i % 3) + 15;
-	  // draw text body
+    // draw text body
     draw.text(d.body).move(x,y)
-		// draw a line from the point of the SMS up
-		draw.line(x,y,x,0).stroke({width:1, color:'#eee'})
-		//console.log('sms', x, d.body)
+    // draw a line from the point of the SMS up
+    draw.line(x,y,x,0).stroke({width:1, color:'#eee'})
+    //console.log('sms', x, d.body)
   })
 
   // draw only those sms's that have media attachments
