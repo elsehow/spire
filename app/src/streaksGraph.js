@@ -2,10 +2,11 @@ var _ = require('lodash')
     , $ = require('jquery')
     , SVG = require('svg.js')
 
-var setup = function (streaksApiData, start, end, $parent) {
+var setup = function (streaksApiData, start, end, $div) {
 
-  $parent.append('<div id="streaksTimeline"></div>')
-  var width = $parent.width() 
+	$div.empty()
+
+  var width = $div.width() 
 	var barHeight = 30
   var height = barHeight*4 // bar height * number of categories
   var scaleTime = function (t) {
@@ -36,14 +37,13 @@ var setup = function (streaksApiData, start, end, $parent) {
 		return scaleTime(endTime) - scaleTime(startTime)
 	}
 
-	function drawBar (draw, color, yPos, xPos, width) {
-		console.log('drawing', color, yPos, xPos, width)
-		draw.rect(width,barHeight)
+	function drawBar (draw, color, yPos, xPos, w) {
+		draw.rect(w,barHeight)
 			  .fill({color:color})
 				.move(xPos,yPos)
 	}
 
-  var drawCtx = SVG('streaksTimeline').size(width,180)
+  var drawCtx = SVG($div.attr('id')).size(width,height)
   streaksApiData.forEach(function (d) {
 		drawBar(
 			drawCtx // svg drawing context

@@ -2,19 +2,21 @@ var _ = require('lodash')
   , $ = require('jquery')
   , SVG = require('svg.js')
 
-var setup = function (data, start, end, $parent) {
+var setup = function (data, start, end, $div) {
 
-  $parent.append('<div id="smsTimeline"></div>')
-  $parent.append('<div id="smsMediaTimeline"></div>')
+	$div.empty()
 
-  var width = $parent.width()
+//  $div.append('<div id="smsTimeline"></div>')
+//  $div.append('<div id="smsMediaTimeline"></div>')
+
+  var width = $div.width()
   var height = 300  // TODO magic numbers BADBADBAD
   var scale_time = function (d) {
     return (parseInt(d.ReceivedAt) - start) / (end - start) * width 
   }
 
   // draw SMS
-  var draw = SVG('smsTimeline').size(width,100)
+  var draw = SVG($div.attr('id')).size(width,100)
   data.forEach(function (d, i) {
     var x = scale_time(d)
     var y = 30 * (i % 3) + 15;

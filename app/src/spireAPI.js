@@ -38,10 +38,10 @@ function withinTime (start, end) {
 module.exports = {
   breath: function (startTime, endTime) { 
 		var date = getDate(startTime)
-    return fetchData('br', date).log('breath')
+    return fetchData('br', date)
   }
   , streaks: function (startTime, endTime) { 
 		var date = getDate(startTime)
-    return fetchData('streaks', date).map(withinTime(startTime, endTime)).log('streaks')
+    return fetchData('streaks', date).map(withinTime(startTime, endTime))
   }
 }

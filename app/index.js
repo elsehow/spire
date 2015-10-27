@@ -8,7 +8,7 @@ var _ = require('lodash')
   , wordGraph = require('./src/wordGraph.js')
   , streaksGraph = require('./src/streaksGraph.js')
   , Tooltip = require('./src/tooltip.js')
-	, dragula = require('dragula')
+//	, dragula = require('dragula')
 
 // each api has a function looks like
 //
@@ -71,8 +71,11 @@ var setup = function() {
   var endTime = Kefir.constant('2015-10-26 11:59 pm').map(unixTimestamp)
 
 	// handle querying=>rendering each API
-	var allResponseStreams = []
 	_.forEach(plugins, function (plugin) {
+
+		var $graph = $('<div id = ' + plugin.name + '></div>')
+		$graphsContainer.append($graph)
+		$graph.html('loading... ' + plugin.name)
 
 	  // for each API, turn start/endtime selections into an api request 
 		var response = Kefir.combine(
@@ -81,9 +84,6 @@ var setup = function() {
 			return plugin.apiFn(ts[0], ts[1])
 		})
 
-	  // add response stream to a list of all responses
-	  allResponseStreams.push(response)	
-
 	  // turn each response into a rendered graph
 		Kefir.combine(
 			[response, startTime, endTime]
@@ -91,23 +91,21 @@ var setup = function() {
 			var data = d[0]
 			var start = d[1]
 			var end = d[2]
-			plugin.renderFn(data, start, end, $graphsContainer)
+			plugin.renderFn(data, start, end, $graph)
+			Tooltip(start, end, $graph)
 		})
+
 	})
 
-	// handle loading messages
-	var userSelections = Kefir.merge([startTime, endTime])
-	var anyData        = Kefir.merge(allResponseStreams)
-	var allData        = Kefir.combine(allResponseStreams)
-  userSelections.onValue(setLoadingMessage)
-  anyData.onValue(clearLoadingMessage)
-	allData.onValue(function () {
-	  // set up draggable div with dragula
-	  var drake = dragula($graphsContainer.get())
-	})
-	userSelections.combine(allData).onValue(function (ts, _) {
-		console.log('tooltipping', ts)
-		Tooltip(ts[0], ts[1], $graphsContainer)
-  })
+	
+//	onValue(function (ts, _) {
+//		console.log('tooltipping', ts)
+//		Tooltip(ts[0], ts[1], $graphsContainer)
+//  })
+
+//	// set up draggable div with dragula
+//	allData.onValue(function () {
+//	  var drake = dragula($graphsContainer.get())
+//	})
 }
 $(document).on('ready', setup)
