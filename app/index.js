@@ -1,5 +1,5 @@
 // config
-var startTimeConfig = '2015-10-26 8:06 pm'
+var startTimeConfig = '2015-10-26 5:06 pm'
   , endTimeConfig = '2015-10-26 11:59 pm'
   , phoneNumber   = '%2B13108017846'
 
