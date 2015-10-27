@@ -18,7 +18,7 @@ var spireQueryURL =  function (type, dateString) {
 }
 
 var esmsQueryURL = function (start, end, from) {
-  return 'http://localhost:20560/q?start='+start+'&end='+end+'&from='+from
+  return 'http://esms.cosmopol.is/q?start='+start+'&end='+end+'&from='+from
 }
 
 function get (module, url, req, res) {

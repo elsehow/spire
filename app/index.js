@@ -1,43 +1,49 @@
+// config
+var startTimeConfig = '2015-10-26 8:06 pm'
+  , endTimeConfig = '2015-10-26 11:59 pm'
+	, phoneNumber   = '%2B13108017846'
+
 var _ = require('lodash')
   , $ = require('jquery')
 	, moment = require('moment')
   , Kefir = require('kefir')
   , spireAPI = require('./src/spireAPI.js')
-  , esmsAPI = require('./src/esmsAPI.js')
+  , esmsAPI = require('./src/esmsAPI.js')(phoneNumber)
   , barGraph = require('./src/barGraph.js')
-  , wordGraph = require('./src/wordGraph.js')
   , streaksGraph = require('./src/streaksGraph.js')
+  , wordGraph = require('./src/wordGraph.js')
   , Tooltip = require('./src/tooltip.js')
 //	, dragula = require('dragula')
 
-// each api has a function looks like
+// each plugin has a `queryFn` that looks like
 //
-//    function api (startTime, endTime)
+//    function queryFn (startTime, endTime)
 //
 // where both values are UNIX timestamps. 
-// the function returns a kefir stream.
+// the function should return a kefir stream.
+// TODO: should return a promise
 //
-// meanwhile, each render function looks like
+// meanwhile, each plugin's `renderFunction` looks like
 //
-//    function render (data, startTime, endTime, $div)
+//    function renderFn (data, startTime, endTime, $div)
 //
-// where some graph of `data` between `startTime` and `endTime` 
-// is appended to `$div`.
+// this fuction should return nothing
+// instead, it should append some graph to `$div`
 
 var plugins = [
   {
 		name:     "breath"
-  ,	apiFn:    spireAPI.breath
+  ,	queryFn:    spireAPI.breath
 	, renderFn: barGraph
   }
 , {
 		name:     "streaks"
-  ,	apiFn:    spireAPI.streaks
+  ,	queryFn:    spireAPI.streaks
 	, renderFn: streaksGraph 
   }
 , {
 		name:     "esms"
-  ,	apiFn:    esmsAPI
+  ,	queryFn:    esmsAPI
 	, renderFn: wordGraph
   }
 ]
@@ -47,28 +53,24 @@ function unixTimestamp (t) {
   return moment(t).format('X')
 }
 
-
-// TODO hi-level comment abt how this program works
+// when we get we get values `startTime` and `endTime`,
+// we go through each plugin in `plugins`
+//
+// for each plugin, we query its `queryFn` with `startTime` and `endTime` as arguments.
+// we draw the results of this query with the plugin's `renderFn`
+//
+// as a bonus, we render a tooltip in each plugin's designated div
+// the tooltip shows the time that the mouse is over.
 
 var setup = function() {
 
 	// initialize our $ variables
   var $graphsContainer = $('#graphsContainer')
 
-	var $loadingMessage = $('#loadingMessage')
-
-  function setLoadingMessage (date) { 
-		$loadingMessage.html('loading ' + date + '...') 
-	}
-
-  function clearLoadingMessage () { 
-		$loadingMessage.empty() 
-	}
-
 	// TODO - these can come from the UI
 	// TODO - move away from the deprecated moment() constructor
-  var startTime = Kefir.constant('2015-10-26 5:30 pm').map(unixTimestamp)
-  var endTime = Kefir.constant('2015-10-26 11:59 pm').map(unixTimestamp)
+  var startTime = Kefir.constant(startTimeConfig).map(unixTimestamp)
+  var endTime = Kefir.constant(endTimeConfig).map(unixTimestamp)
 
 	// handle querying=>rendering each API
 	_.forEach(plugins, function (plugin) {
@@ -81,7 +83,7 @@ var setup = function() {
 		var response = Kefir.combine(
 			[startTime, endTime]
 		).flatMapLatest(function (ts) {
-			return plugin.apiFn(ts[0], ts[1])
+			return plugin.queryFn(ts[0], ts[1])
 		})
 
 	  // turn each response into a rendered graph
@@ -96,16 +98,6 @@ var setup = function() {
 		})
 
 	})
-
-	
-//	onValue(function (ts, _) {
-//		console.log('tooltipping', ts)
-//		Tooltip(ts[0], ts[1], $graphsContainer)
-//  })
-
-//	// set up draggable div with dragula
-//	allData.onValue(function () {
-//	  var drake = dragula($graphsContainer.get())
-//	})
 }
+
 $(document).on('ready', setup)

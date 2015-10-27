@@ -1,24 +1,26 @@
 var _ = require('lodash')
-    , $ = require('jquery')
-    , SVG = require('svg.js')
+  , $ = require('jquery')
+  , SVG = require('svg.js')
+  , linearScale = require('simple-linear-scale')
 
 var setup = function (streaksApiData, start, end, $div) {
 
 	$div.empty()
 
   var width = $div.width() 
+
 	var barHeight = 30
+
   var height = barHeight*4 // bar height * number of categories
-  var scaleTime = function (t) {
-    return (t - start) / (end-start) * width
-  }
+
+	var scaleTime = linearScale([start, end], [0, width])
 
 	function color (t) {
 		if (t==="tense")    return  '#FD7400'  //'#D92525' // '#f00' //red 
 		if (t==="calm")     return  '#004358'  // #040DBF' // '#0f0' // blue 
 		if (t==="focus")    return  '#BEDB39'  //'#88A61B' // '#00f' //green
 		if (t==="activity") return  '#FFE11A'  //'#F29F05' // '#ff0' // yellow
-		//if (t==="inactive") return  '#eee'  
+		if (t==="inactive") return  '#eee'  
 	}
 
 	function yPos(t) {
@@ -26,14 +28,14 @@ var setup = function (streaksApiData, start, end, $div) {
 		if (t==="calm") return 2*barHeight
 		if (t==="focus") return 3*barHeight
 		if (t==="activity") return 4*barHeight
-		//if (t==="inactive") return 5*barHeight
+		if (t==="inactive") return 5*barHeight
 	}
 
 	function xPos (startTime) {
 		return scaleTime(startTime)
 	}
 
-	function barWidth (startTime, endTime) {
+	function streakBarWidth (startTime, endTime) {
 		return scaleTime(endTime) - scaleTime(startTime)
 	}
 
@@ -50,7 +52,7 @@ var setup = function (streaksApiData, start, end, $div) {
 			, color(d.type)  // color is a fn of data type (focus/tense/etc)
 			, yPos(d.type) // y pos is also a fn of data type
 			, xPos(d.start_at)
-			, barWidth(d.start_at, d.stop_at))
+			, streakBarWidth(d.start_at, d.stop_at))
   })
 
 //	function drawBarFlat (draw, color, xPos, width) {
@@ -65,7 +67,7 @@ var setup = function (streaksApiData, start, end, $div) {
 //			drawCtx // svg drawing context
 //			, color(d.type)  // color is a fn of data type (focus/tense/etc)
 //			, xPos(d.start_at)
-//			, barWidth(d.start_at, d.stop_at))
+//			, streakBarWidth(d.start_at, d.stop_at))
 //  })
 }
 	
