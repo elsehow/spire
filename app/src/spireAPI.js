@@ -16,29 +16,32 @@ var queryOpts = function (type, date) {
   }
 }
 
-var getData = function (type, date) {
+function fetchData (type, date) {
   var responseStream = KefirGet(queryOpts(type,date))
   return responseStream.map(JSON.parse)
 }
 
-function filterForDate (date) {
+// returns a date from a unix time
+function getDate (unixTime) {
+  return moment(unixTime*1000).format('YYYY-MM-DD')
+}
+
+function withinTime (start, end) {
 	return function (data) {
-		var plusOne = moment(date).add(1,'day')
-		var minusOne = moment(date).subtract(1,'day')
-		function between (d) {
-			if (moment(d.start_at*1000).isBetween(minusOne, plusOne)) {
-				return d
-			}
-		}
-  	return _.filter(data, between)
+		return _.filter(data, function (streak) {
+      if (moment(streak.start_at*1000).isBetween(start*1000, end*1000))
+		    return streak 
+		})
 	}
 }
 
 module.exports = {
   breath: function (startTime, endTime) { 
-    return getData('br', date) 
+		var date = getDate(startTime)
+    return fetchData('br', date).log('breath')
   }
-  , streaks: function (date, startTime, endTime) { 
-    return getData('streaks', date).map(filterForDate(date))
+  , streaks: function (startTime, endTime) { 
+		var date = getDate(startTime)
+    return fetchData('streaks', date).map(withinTime(startTime, endTime)).log('streaks')
   }
 }

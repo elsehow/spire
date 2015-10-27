@@ -6,7 +6,7 @@ var _ = require('lodash')
   , esmsAPI = require('./src/esmsAPI.js')
   , barGraph = require('./src/barGraph.js')
   , wordGraph = require('./src/wordGraph.js')
-  , flowGraph = require('./src/streaksGraph.js')
+  , streaksGraph = require('./src/streaksGraph.js')
   , Tooltip = require('./src/tooltip.js')
 
 // each api has a function looks like
@@ -24,17 +24,17 @@ var _ = require('lodash')
 // is appended to `$div`.
 
 var plugins = [
-//  {
-//		name:     "breath"
-//  ,	apiFn:    spireAPI.breath
-//	, renderFn: barGraph
-//  }
-//, {
-//		name:     "streaks"
-//  ,	apiFn:    spireAPI.streaks
-//	, renderFn: flowGraph
-//  }
- {
+  {
+		name:     "breath"
+  ,	apiFn:    spireAPI.breath
+	, renderFn: barGraph
+  }
+, {
+		name:     "streaks"
+  ,	apiFn:    spireAPI.streaks
+	, renderFn: streaksGraph 
+  }
+, {
 		name:     "esms"
   ,	apiFn:    esmsAPI
 	, renderFn: wordGraph
@@ -65,8 +65,9 @@ var setup = function() {
 	}
 
 	// TODO - these can come from the UI
-  var startTime = Kefir.constant('2015-10-14 10:30 am').map(unixTimestamp)
-  var endTime = Kefir.constant('2015-10-14 3:15 pm').map(unixTimestamp)
+	// TODO - move away from the deprecated moment() constructor
+  var startTime = Kefir.constant('2015-10-26 5:30 pm').map(unixTimestamp)
+  var endTime = Kefir.constant('2015-10-26 11:59 pm').map(unixTimestamp)
 
 	// handle querying=>rendering each API
 	var allResponseStreams = []
@@ -85,15 +86,23 @@ var setup = function() {
 	  // turn each response into a rendered graph
 		Kefir.combine(
 			[response, startTime, endTime]
-		).onValue(function (data, start, end) {
-        plugin.renderFn(data, start, end, $graphsContainer)
+		).onValue(function (d) {
+			var data = d[0]
+			var start = d[1]
+			var end = d[2]
+			plugin.renderFn(data, start, end, $graphsContainer)
 		})
 	})
 
 	// handle loading messages
-	var anyData        = Kefir.merge(allResponseStreams)
 	var userSelections = Kefir.merge([startTime, endTime])
+	var anyData        = Kefir.merge(allResponseStreams)
+	var allData        = Kefir.combine(allResponseStreams)
   userSelections.onValue(setLoadingMessage)
   anyData.onValue(clearLoadingMessage)
+	userSelections.combine(allData).onValue(function (ts, _) {
+		console.log('tooltipping', ts)
+		Tooltip(ts[0], ts[1], $graphsContainer)
+  })
 }
 $(document).on('ready', setup)

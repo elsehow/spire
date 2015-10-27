@@ -19,31 +19,8 @@ var queryOpts = function (start, end, number) {
 //returns a stream of API responses
 var getData = function (startTime, endTime) {
 	var opts = queryOpts( startTime , endTime , my_phone_number)
-		console.log('opts', opts)
   var responseStream = kefirAjax(opts)
   return responseStream.map(JSON.parse)
 }
 
 module.exports = getData
-
-//// turns API response into the form
-////
-////   [ { body, timestamp, media }, ... ]
-//// where each SMS is sorted by timestamp
-//var process = function (data) {
-//  // get sms bodies
-//  var bodies = _.pluck(data, "Body")
-//  // get SMS times
-//  var times = _.map(data, function (d) {
-//    return d.ReceivedAt*1000
-//  })
-//  // get any media in the SMSs
-//  var media = _.pluck(data, "MediaUrl0")
-//  var z = _.map(
-//    _.zip(bodies, times, media)
-//    , function (d) {
-//      return {body: d[0], timestamp: d[1], media:d[2]}
-//    })
-//  return _.sortBy(z, 'timestamp')
-//}
-

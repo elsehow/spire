@@ -3,7 +3,7 @@ var $ = require('jquery')
   , map = function (num, in0, in1, out0, out1) {return (num- in0) * (out1 - out0) / (in1 - in0) + out0 }
   , moment = require('moment')
 
-setup = function (start, end, $graphsContainer) {
+setup = function (_, start, end, $graphsContainer) {
 
   //setup
   $(document.body).append('<div id = "time-tooltip"></div>')
