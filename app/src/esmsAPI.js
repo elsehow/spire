@@ -4,8 +4,6 @@ var kefirAjax = require('kefir-jquery-ajax')
 
 function setup (phoneNumber) {
 
-	console.log('setting up with', phoneNumber)
-  
   //returns a promise for a GET to the query string
   var queryOpts = function (start, end) {
      var url = 'http://127.0.0.1:3000/esms'

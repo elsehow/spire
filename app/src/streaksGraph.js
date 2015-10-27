@@ -11,7 +11,7 @@ var setup = function (streaksApiData, start, end, $div) {
 
 	var barHeight = 30
 
-  var height = barHeight*4 // bar height * number of categories
+  var height = barHeight*5 // bar height * number of categories
 
 	var scaleTime = linearScale([start, end], [0, width])
 
@@ -25,10 +25,10 @@ var setup = function (streaksApiData, start, end, $div) {
 
 	function yPos(t) {
 		if (t==="tense") return 0
-		if (t==="calm") return 2*barHeight
-		if (t==="focus") return 3*barHeight
-		if (t==="activity") return 4*barHeight
-		if (t==="inactive") return 5*barHeight
+		if (t==="calm") return 1*barHeight
+		if (t==="focus") return 2*barHeight
+		if (t==="activity") return 3*barHeight
+		if (t==="inactive") return 4*barHeight
 	}
 
 	function xPos (startTime) {

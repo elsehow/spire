@@ -3,14 +3,14 @@ var _ = require('lodash')
   , SVG = require('svg.js')
   , linearScale = require('simple-linear-scale')
 
-// adds a new line every n chars
+// adds a new line every n words
 function addNewlines (str, n) {
-	var arr = str.split('')
-	var chunks = _.chunk(str, n)
-	var strings = chunks.map(function (c) { 
-		return c.join('') 
+	var words = str.split(' ')
+	var nWordChunks = _.chunk(words, n)
+	var lines = nWordChunks.map(function (c) { 
+	 	return c.join(' ') 
 	})
-	return strings.join('\n')
+	return lines.join('\n')
 }
 
 var setup = function (data, start, end, $div) {
@@ -22,17 +22,17 @@ var setup = function (data, start, end, $div) {
 
   var width = $div.width()
 
-  var smsTimelineHeight    = 400 // TODO magic numbers BADBADBAD
+  var smsTimelineHeight    = 300 // TODO magic numbers BADBADBAD
 
-	var smsHeight            = 100
+	var smsHeight            = 70
 
-	var charsPerLine         = 20
+	var wordsPerLine         = 3
 
   var photosTimelineHeight = 300 // TODO magic numbers BADBADBAD
 
-	var photoHeight          = 200
+	var photoHeight          = 150 
 
-	var photoWidth           = 200
+	var photoWidth           = 150 
 
   var photos               = _.filter(data, 'MediaUrl0')
 
@@ -46,10 +46,13 @@ var setup = function (data, start, end, $div) {
 		// get the x based on the time of the text
 		var x = scaleTime(sms.ReceivedAt)
     // get the y of the text based on index
-		var y = i % (smsTimelineHeight/smsHeight) * smsHeight
+		var y = (i % (smsTimelineHeight/smsHeight) * smsHeight)
     // draw text body
-    var body = addNewlines(sms.Body, charsPerLine)
-    draw.text(body).move(x,y)
+    var body = addNewlines(sms.Body, wordsPerLine)
+    var text = draw.text(body).move(x,y)
+    text.font({
+      size:10
+    })
     // draw a vertical line from the vertical point of the SMS up
     draw.line(x,y,x,0).stroke({width:1, color:'#eee'})
   })

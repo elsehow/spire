@@ -19,7 +19,7 @@ setup = function (start, end, $container) {
 	}
 
 	function xToTime (x) {
-    var t = map(x, 5, containerWidth, startTime, endTime)
+    var t = map(x, 5, containerWidth+5, startTime, endTime)
     return new Date(t)
 	}
 

@@ -1,7 +1,8 @@
 // config
-var startTimeConfig = '2015-10-26 5:06 pm'
-  , endTimeConfig = '2015-10-26 11:59 pm'
-  , phoneNumber   = '%2B13108017846'
+var startTimeConfig = '2015-10-27 12:30 pm'
+  , endTimeConfig = '2015-10-27 4:15 pm'
+  , phoneNumber   = '%2B16265890535'    //richmond
+  //, phoneNumber   = '%2B13108017846'  //nick
 
 var _ = require('lodash')
   , $ = require('jquery')
@@ -75,27 +76,33 @@ var setup = function() {
 	// handle querying=>rendering each API
 	_.forEach(plugins, function (plugin) {
 
+    // a $div for our graph
 		var $graph = $('<div id = ' + plugin.name + '></div>')
-		$graphsContainer.append($graph)
-		$graph.html('loading... ' + plugin.name)
+    $graph.html('loading ' + plugin.name)
+    $graphsContainer.append($graph)
 
-	  // for each API, turn start/endtime selections into an api request 
-		var response = Kefir.combine(
+		var timeSelection = Kefir.combine(
 			[startTime, endTime]
-		).flatMapLatest(function (ts) {
-			return plugin.queryFn(ts[0], ts[1])
+		)
+
+    // turn time selection into an API response
+    var response = timeSelection.flatMapLatest(function (ts) {
+      var start = ts[0]
+      var end   = ts[1]
+			return plugin.queryFn(start, end)
 		})
 
-	  // turn each response into a rendered graph
+	  // turn API response into a rendered graph
 		Kefir.combine(
 			[response, startTime, endTime]
 		).onValue(function (d) {
-			var data = d[0]
+			var data  = d[0]
 			var start = d[1]
-			var end = d[2]
+			var end   = d[2]
 			plugin.renderFn(data, start, end, $graph)
 			Tooltip(start, end, $graph)
 		})
+
 
 	})
 }
