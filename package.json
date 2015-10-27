@@ -23,6 +23,7 @@
   "homepage": "https://github.com/elsehow/spir",
   "dependencies": {
     "cors": "^2.7.1",
+    "dragula": "^3.5.2",
     "express": "^4.13.3",
     "jquery": "^2.1.4",
     "kefir": "^2.7.2",

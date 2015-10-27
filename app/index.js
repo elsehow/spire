@@ -8,6 +8,7 @@ var _ = require('lodash')
   , wordGraph = require('./src/wordGraph.js')
   , streaksGraph = require('./src/streaksGraph.js')
   , Tooltip = require('./src/tooltip.js')
+	, dragula = require('dragula')
 
 // each api has a function looks like
 //
@@ -100,6 +101,10 @@ var setup = function() {
 	var allData        = Kefir.combine(allResponseStreams)
   userSelections.onValue(setLoadingMessage)
   anyData.onValue(clearLoadingMessage)
+	allData.onValue(function () {
+	  // set up draggable div with dragula
+	  var drake = dragula($graphsContainer.get())
+	})
 	userSelections.combine(allData).onValue(function (ts, _) {
 		console.log('tooltipping', ts)
 		Tooltip(ts[0], ts[1], $graphsContainer)
