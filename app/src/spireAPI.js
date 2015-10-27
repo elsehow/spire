@@ -35,10 +35,10 @@ function filterForDate (date) {
 }
 
 module.exports = {
-  breath: function (date) { 
+  breath: function (startTime, endTime) { 
     return getData('br', date) 
   }
-  , streaks: function (date) { 
+  , streaks: function (date, startTime, endTime) { 
     return getData('streaks', date).map(filterForDate(date))
   }
 }
