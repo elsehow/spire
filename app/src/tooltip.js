@@ -3,20 +3,23 @@ var $ = require('jquery')
   , map = function (num, in0, in1, out0, out1) {return (num- in0) * (out1 - out0) / (in1 - in0) + out0 }
   , moment = require('moment')
 
-setup = function (start, end, $graphsContainer) {
+setup = function (start, end, $container) {
 
   //setup
   $(document.body).append('<div id = "time-tooltip"></div>')
   var $tooltip = $('#time-tooltip')
-  var containerWidth = $(window).width()
+  var containerWidth = $container.width()
 	var height = 40
+
+	var startTime = parseInt(start)*1000
+	var endTime = parseInt(end)*1000
 
 	function clientX (ev) {
 		return ev.clientX
 	}
 
 	function xToTime (x) {
-    var t = map(x, 5, containerWidth, start, end)
+    var t = map(x, 5, containerWidth, startTime, endTime)
     return new Date(t)
 	}
 
@@ -33,11 +36,11 @@ setup = function (start, end, $graphsContainer) {
     $tooltip.css('top', ev.pageY-height)
   }
 
-  $graphsContainer.mouseover(function () { $tooltip.show() })
-  $graphsContainer.mouseout(function () { $tooltip.hide() })
+  $container.mouseover(function () { $tooltip.show() })
+  $container.mouseout(function () { $tooltip.hide() })
 
 	// stream of mousemoves
-  var mousemoves = Kefir.fromEvents($graphsContainer, 'mousemove').throttle(25)
+  var mousemoves = Kefir.fromEvents($container, 'mousemove').throttle(25)
   // map the X position of the mouse to a time in the timerange
   var datesFromMouseX = mousemoves.map(clientX).map(xToTime).map(formatDate)
 

@@ -1,21 +1,48 @@
-var  $        = require('jquery')
-   , Rickshaw = require('rickshaw')
-   , unixTime = require('unix-timestamp')
-   , randomString = require('make-random-string')
+var _ = require('lodash')
+    , $ = require('jquery')
+    , SVG = require('svg.js')
+		, linearScale = require('simple-linear-scale')
+		 
+var setup = function (spireResp, start, end, $div) {
 
-var setup = function (data, start, end, $parent) {
-  // put a div with a random ID in $parent
-  var divID = randomString(3)
-  $parent.append('<div id="' + divID + '"></div>')
-  var this_el = $('#' + divID).get(0) //needs to be a native html element
-  //rickshaw graph
-  var graph = new Rickshaw.Graph({
-    element: this_el,
-    renderer:'bar',
-    height: 150, 
-    series: [{color:'#004358', data: data}],
+  var width     = $div.width() 
+
+  var height    = 300 // TODO magic numbers lol
+
+  var dotRadius = 4   // TODO magic numbers lol
+
+	var maxValue  = _.max(values(spireResp))
+
+	var blue      = '#004358'  
+
+	var xScale    = linearScale([start, end], [0, width])
+
+	var yScale    = linearScale([0, maxValue], [0, height]);
+
+  function values (spireResp) {
+    return _.pluck(spireResp.data, 'value')
+  }
+  
+	function drawCircle (draw, xPos, yPos) {
+		draw.circle(dotRadius)
+			  .fill({color:blue})
+				.move(xPos,yPos)
+	}
+
+	// draw graph
+	$div.empty()
+  var drawCtx = SVG($div.attr('id')).size(width,height)
+  _.forEach(spireResp.data, function (d) {
+		var x = xScale(d.timestamp)
+		var y = yScale(d.value)
+		drawCircle(drawCtx, x, y)
   })
-  graph.render()  
-}
 
-module.exports = setup 
+}
+	
+module.exports = setup
+
+
+
+
+

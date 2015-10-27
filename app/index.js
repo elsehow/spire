@@ -1,161 +1,103 @@
+// config
+var startTimeConfig = '2015-10-26 8:06 pm'
+  , endTimeConfig = '2015-10-26 11:59 pm'
+	, phoneNumber   = '%2B13108017846'
+
 var _ = require('lodash')
   , $ = require('jquery')
+	, moment = require('moment')
   , Kefir = require('kefir')
-  , dateSelector = require('./src/dateSelector.js')
   , spireAPI = require('./src/spireAPI.js')
-  , esmsAPI = require('./src/esmsAPI.js')
+  , esmsAPI = require('./src/esmsAPI.js')(phoneNumber)
   , barGraph = require('./src/barGraph.js')
+  , streaksGraph = require('./src/streaksGraph.js')
   , wordGraph = require('./src/wordGraph.js')
-  , flowGraph = require('./src/streaksGraph.js')
   , Tooltip = require('./src/tooltip.js')
+//	, dragula = require('dragula')
 
-// TODO
-// Fix weird day rollover issue for SMS (hint: +/- 24h)
-// draw streaks graph................   (hint: if it were p5)
+// each plugin has a `queryFn` that looks like
 //
+//    function queryFn (startTime, endTime)
 //
+// where both values are UNIX timestamps. 
+// the function should return a kefir stream.
+// TODO: should return a promise
 //
+// meanwhile, each plugin's `renderFunction` looks like
 //
-// we have several APIs here, spireAPI, esmsAPI, ..
-// when a value comes through `dateSelectionStream`,
-// we flat map that data to a response from each API
+//    function renderFn (data, startTime, endTime, $div)
 //
-// that response gets passed, unchanged, to a view function
-// see (side-effecy view functions, below)
+// this fuction should return nothing
+// instead, it should append some graph to `$div`
+
+var plugins = [
+  {
+		name:     "breath"
+  ,	queryFn:    spireAPI.breath
+	, renderFn: barGraph
+  }
+, {
+		name:     "streaks"
+  ,	queryFn:    spireAPI.streaks
+	, renderFn: streaksGraph 
+  }
+, {
+		name:     "esms"
+  ,	queryFn:    esmsAPI
+	, renderFn: wordGraph
+  }
+]
+
+// takes any moment-like object
+function unixTimestamp (t) {
+  return moment(t).format('X')
+}
+
+// when we get we get values `startTime` and `endTime`,
+// we go through each plugin in `plugins`
 //
-// in the meantime, we collect responses from each API to find a
-// global start and stop time
+// for each plugin, we query its `queryFn` with `startTime` and `endTime` as arguments.
+// we draw the results of this query with the plugin's `renderFn`
 //
-// produce `rangedData`:
-//
-//   { breath, esms, streaks, start, end }
-//
-// where breah, esms, streaks, ... all have their own special format
-// but where start + end represent the global endpoints for all data
-//
+// as a bonus, we render a tooltip in each plugin's designated div
+// the tooltip shows the time that the mouse is over.
 
 var setup = function() {
 
-  // set up the DOM
 	// initialize our $ variables
-  $(document.body).append('<div id = "loadingMessage"></div>')
-  $(document.body).append('<div id = "graphsContainer"></div>')
   var $graphsContainer = $('#graphsContainer')
-	var $loadingMessage = $('#loadingMessage')
 
-	// side-effecty view functions
-  function setLoadingMessage (date) { 
-		$loadingMessage.html('loading ' + date + '...') 
-	}
+	// TODO - these can come from the UI
+	// TODO - move away from the deprecated moment() constructor
+  var startTime = Kefir.constant(startTimeConfig).map(unixTimestamp)
+  var endTime = Kefir.constant(endTimeConfig).map(unixTimestamp)
 
-  function clearLoadingMessage () { 
-		$loadingMessage.empty() 
-	}
+	// handle querying=>rendering each API
+	_.forEach(plugins, function (plugin) {
 
-  function breathGraph (d, start, end) {
-    var timeseries = _.map(d['data'], function (d) {
-			return {y: d.value, x: d.timestamp}
+		var $graph = $('<div id = ' + plugin.name + '></div>')
+		$graphsContainer.append($graph)
+		$graph.html('loading... ' + plugin.name)
+
+	  // for each API, turn start/endtime selections into an api request 
+		var response = Kefir.combine(
+			[startTime, endTime]
+		).flatMapLatest(function (ts) {
+			return plugin.queryFn(ts[0], ts[1])
 		})
-    barGraph(timeseries, start, end, $graphsContainer)
-  }
 
-  function esmsGraph (d, start, end) { 
-		wordGraph(d, start, end, $graphsContainer) 
-	}
+	  // turn each response into a rendered graph
+		Kefir.combine(
+			[response, startTime, endTime]
+		).onValue(function (d) {
+			var data = d[0]
+			var start = d[1]
+			var end = d[2]
+			plugin.renderFn(data, start, end, $graph)
+			Tooltip(start, end, $graph)
+		})
 
- 	function streaksGraph (d, start, end) { 
-		flowGraph(d, start, end, $graphsContainer) 
-	}
-
-	function tooltip(_, start, end) {
-		Tooltip(start, end, $graphsContainer)
-	}
-
-	// finds the global max + min times for each dataset
-	// returns an object 
-	//
-	//   {start, end}
-	//
-	// where both are UNIX times
-
-	function globalTimerange (breath, streaks, esms) {
-
-		function range (start, end) {
-			return {start: start, end: end}
-		}
-
-		function breath_timerange (b) {
-			return range(b.metadata.from*1000, b.metadata.to*1000)
-		}
-
-		function streaks_timerange (s) {
-			return range(_.first(s).start_at*1000, _.last(s).end_at*1000)
-		}
-
-		function esms_timerange (e) {
-			return range(_.first(e).timestamp, _.last(e).timestamp)
-		}
-
-		var ranges = [
-			breath_timerange(breath)
-			, streaks_timerange(streaks)
-			, esms_timerange(esms)
-		]
-
-		// returns an object 
-		//
-		//   {start, end}
-		//
-		// where `start` is the minimum start date of all objects
-		// and `end` is the maximum end date of all objects 
-		
-		return range(
-				_.min(_.pluck(ranges,'start'))
-				, _.max(_.pluck(ranges,'end')))
-	}
-
-  //streams
-/
-  //var dateSelectionStream = dateSelector()  // TODO DEBUG
-  var dateSelectionStream = Kefir.constant('2015-10-14')
-  var breathData          = dateSelectionStream.flatMapLatest(spireAPI.breath)
-  var streaksData         = dateSelectionStream.flatMapLatest(spireAPI.streaks)
-  var esmsData            = dateSelectionStream.flatMapLatest(esmsAPI)
-
-	// produce `rangedData`:
-	//
-	//   { breath, esms, streaks, start, end }
-	//
-	// where breah, esms, streaks, ... all have their own special format
-	// but where start + end represent the global endpoints for all data
-	//
-	var allData    = Kefir.combine(
-			               [breathData,streaksData, esmsData]
-                     , function (b, s, e) {
-											   var t = globalTimerange(b, s, e)
-                         return { breath: b
-                                , streaks: s 
-                                , esms: e
-		                            , start: t.start
-		                            , end: t.end
-                      }
-										)
-
-
-	// side effects
-  dateSelectionStream.onValue(setLoadingMessage)
-
-  rangedData.onValue(function (d) {
-    function drawWith(fn, data) {
- 	   fn(data, d.start, d.end)
-    }
-    drawWith(breathGraph, d.breath);
-    drawWith(streaksGraph,d.streaks);
-    drawWith(esmsGraph,d.esms);
-	  drawWith(tooltip, null)
 	})
-
-  allData.onValue(clearLoadingMessage)
-
 }
+
 $(document).on('ready', setup)

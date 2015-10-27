@@ -17,8 +17,8 @@ var spireQueryURL =  function (type, dateString) {
   return 'https://app.spire.io//api/' + type + '?date=' + dateString + '&access_token=' + spireToken;
 }
 
-var esmsQueryURL = function (from, date) {
-  return 'http://esms.cosmopol.is/q?from='+from+'&date=?'+date
+var esmsQueryURL = function (start, end, from) {
+  return 'http://esms.cosmopol.is/q?start='+start+'&end='+end+'&from='+from
 }
 
 function get (module, url, req, res) {
@@ -51,7 +51,7 @@ app.get('/', function (req, res) {
 })
 
 app.get('/esms', function (req, res) {
-  var url = esmsQueryURL(req.query.from, req.query.date)
+  var url = esmsQueryURL(req.query.start, req.query.end, req.query.from)
 	httpGet(url, req, res)
 })
 
