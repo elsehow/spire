@@ -1,7 +1,7 @@
 // config
 var startTimeConfig = '2015-10-26 8:06 pm'
   , endTimeConfig = '2015-10-26 11:59 pm'
-	, phoneNumber   = '%2B13108017846'
+  , phoneNumber   = '%2B13108017846'
 
 var _ = require('lodash')
   , $ = require('jquery')
