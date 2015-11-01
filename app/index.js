@@ -13,7 +13,7 @@ var _ = require('lodash')
   , barGraph = require('./src/barGraph.js')
   , streaksGraph = require('./src/streaksGraph.js')
   , wordGraph = require('./src/wordGraph.js')
-  , Tooltip = require('./src/tooltip.js')
+  , timeScale = require('./src/timeScale.js')
 //	, dragula = require('dragula')
 
 // each plugin has a `queryFn` that looks like
@@ -44,8 +44,12 @@ var plugins = [
   }
 , {
 		name:     "esms"
-  ,	queryFn:    esmsAPI
-	, renderFn: wordGraph
+  ,	queryFn:   esmsAPI
+	, renderFn:  wordGraph
+  }
+, { name:     "timeScale"
+  , queryFn:   function () { return Kefir.constant(1) }
+  , renderFn:  timeScale
   }
 ]
 
@@ -81,9 +85,10 @@ var setup = function() {
     $graph.html('loading ' + plugin.name)
     $graphsContainer.append($graph)
 
-		var timeSelection = Kefir.combine(
-			[startTime, endTime]
-		)
+    var timeSelection = Kefir.combine(
+    	[startTime, endTime]
+    )
+
 
     // turn time selection into an API response
     var response = timeSelection.flatMapLatest(function (ts) {
@@ -100,10 +105,7 @@ var setup = function() {
 			var start = d[1]
 			var end   = d[2]
 			plugin.renderFn(data, start, end, $graph)
-			Tooltip(start, end, $graph)
 		})
-
-
 	})
 }
 
