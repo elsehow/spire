@@ -5,10 +5,10 @@ var _ = require('lodash')
 
 // adds a new line every n chars
 function addNewlines (str, n) {
-	var arr = str.split('')
-	var chunks = _.chunk(str, n)
+	var arr = str.split(' ')
+	var chunks = _.chunk(arr, n)
 	var strings = chunks.map(function (c) { 
-		return c.join('') 
+		return c.join(' ') 
 	})
 	return strings.join('\n')
 }
@@ -20,15 +20,17 @@ var setup = function (data, start, end, $div) {
   $div.append('<div id="smsTimeline"></div>')
   $div.append('<div id="smsPhotoTimeline"></div>')
 
-  var width = $div.width()
+  var width                = $div.width()
 
-  var smsTimelineHeight    = 400 // TODO magic numbers BADBADBAD
+  var smsTimelineHeight    = 300 
 
 	var smsHeight            = 100
 
-	var charsPerLine         = 20
+  var staggerHeight        = smsHeight*1.2
 
-  var photosTimelineHeight = 300 // TODO magic numbers BADBADBAD
+	var wordsPerLine         = 3
+
+  var photosTimelineHeight = 300 
 
 	var photoHeight          = 200
 
@@ -45,10 +47,10 @@ var setup = function (data, start, end, $div) {
   texts.forEach(function (sms, i) {
 		// get the x based on the time of the text
 		var x = scaleTime(sms.ReceivedAt)
-    // get the y of the text based on index
-		var y = i % (smsTimelineHeight/smsHeight) * smsHeight
+    // stagger the texts on the y axis
+		var y = i*staggerHeight % smsTimelineHeight
     // draw text body
-    var body = addNewlines(sms.Body, charsPerLine)
+    var body = addNewlines(sms.Body, wordsPerLine)
     draw.text(body).move(x,y)
     // draw a vertical line from the vertical point of the SMS up
     draw.line(x,y,x,0).stroke({width:1, color:'#eee'})

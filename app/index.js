@@ -32,17 +32,17 @@ var _ = require('lodash')
 // instead, it should append some graph to `$div`
 
 var plugins = [
-  {
-		name:     "breath"
-  ,	queryFn:    spireAPI.breath
-	, renderFn: barGraph
-  }
-, {
-		name:     "streaks"
-  ,	queryFn:    spireAPI.streaks
-	, renderFn: streaksGraph 
-  }
-, {
+//  {
+//		name:     "breath"
+//  ,	queryFn:    spireAPI.breath
+//	, renderFn: barGraph
+//  }
+//, {
+//		name:     "streaks"
+//  ,	queryFn:    spireAPI.streaks
+//	, renderFn: streaksGraph 
+//  }
+ {
 		name:     "esms"
   ,	queryFn:   esmsAPI
 	, renderFn:  wordGraph
@@ -88,7 +88,6 @@ var setup = function() {
     var timeSelection = Kefir.combine(
     	[startTime, endTime]
     )
-
 
     // turn time selection into an API response
     var response = timeSelection.flatMapLatest(function (ts) {

@@ -15,11 +15,11 @@ var setup = function (_, start, end, $div) {
 
   var width         = $div.width() 
 
-	var height        = 20
+	var height        = 40
 
   var numKeyframes  = 10
 
-  var wordHeight    = 9 
+  var wordHeight    = 12
 
   var wordPadding   = height/5
 
