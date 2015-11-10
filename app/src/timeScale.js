@@ -15,7 +15,7 @@ var setup = function (_, start, end, $div) {
 
   var width         = $div.width() 
 
-	var height        = 40
+	var height        = 45
 
   var numKeyframes  = 10
 
@@ -38,7 +38,7 @@ var setup = function (_, start, end, $div) {
     var x = scaleTime(k)
     var t = moment(k*1000).format('h:mm a')
     draw.line(x,height-wordHeight-wordPadding,x,0).stroke({width:1, color:'#000'})
-    var text = draw.text(t).move(x,height-wordHeight)
+    var text = draw.text(t).move(x,height-wordHeight-5)
     // right-justify the last keyframe text
     if (i == numKeyframes)
       var anchor = 'end'
